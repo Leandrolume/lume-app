@@ -1,0 +1,2344 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="theme-color" content="#08080f">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lume">
+<meta name="application-name" content="Lume">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Lume — Seus hábitos, sem filtro</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased}
+:root{
+  --black:#08080f;--dark:#0c0c16;--card:#101018;--card2:#14141e;--card3:#18182 4;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.11);
+  --blue:#2563eb;--blue-g:rgba(37,99,235,0.3);--blue-l:#4a8af5;--blue-d:#1e3a7a;
+  --text:#f0f0f8;--t2:#8890a8;--t3:#454860;
+  --green:#1fc97a;--red:#ef4f60;--orange:#f5a020;--purple:#8b5cf6;
+}
+html,body{width:100%;height:100%;background:#000;font-family:'Inter',-apple-system,sans-serif;color:var(--text);overflow:hidden}
+
+/* DEVICE */
+.wrap{display:flex;justify-content:center;align-items:center;height:100vh;background:radial-gradient(ellipse 80% 60% at 50% 40%,#0a0a20,#000)}
+.device{position:relative;width:390px;height:844px;background:var(--black);border-radius:52px;overflow:hidden;border:1.5px solid rgba(255,255,255,0.1);box-shadow:0 0 100px rgba(37,99,235,0.12),0 60px 150px rgba(0,0,0,0.9),inset 0 1px 0 rgba(255,255,255,0.07)}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;background:var(--black);overflow:hidden}
+.screen.active{display:flex}
+.sb{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;font-size:14px;font-weight:600;color:rgba(255,255,255,0.8);flex-shrink:0}
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden}
+.scroll::-webkit-scrollbar{display:none}
+
+/* NAV */
+.nbtn{position:absolute;z-index:200;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:#fff;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;transition:all 0.2s;backdrop-filter:blur(12px)}
+.nbtn:hover{background:rgba(255,255,255,0.14)}
+.nprev{left:10px;top:50%;transform:translateY(-50%)}
+.nnext{right:10px;top:50%;transform:translateY(-50%)}
+.nctr{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--t3);z-index:200;background:rgba(0,0,0,0.6);padding:3px 9px;border-radius:20px;pointer-events:none}
+
+/* TAB BAR */
+.tab{height:78px;background:rgba(8,8,16,0.95);border-top:0.5px solid var(--border);display:flex;align-items:flex-start;justify-content:space-around;padding-top:10px;flex-shrink:0;backdrop-filter:blur(20px)}
+.ti{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;opacity:.4;transition:opacity 0.2s;min-width:52px;color:var(--t2)}
+.ti.on{opacity:1;color:var(--blue-l)}
+.ti svg{stroke:currentColor;fill:none;width:22px;height:22px;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.ti span{font-size:9.5px;font-weight:500}
+
+/* BUTTONS */
+.btn{display:flex;align-items:center;justify-content:center;background:var(--blue);color:#fff;border:none;border-radius:14px;font-size:16px;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:inherit;letter-spacing:-0.2px}
+.btn:active{transform:scale(0.97)}
+.btn-ghost{background:transparent;color:var(--t2);border:none;font-size:14px;cursor:pointer;font-family:inherit;padding:8px 0}
+.btn-out{background:rgba(255,255,255,0.05);color:#fff;border:0.5px solid var(--border2);border-radius:14px;font-size:16px;font-weight:500;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center}
+
+/* CARDS */
+.card{background:var(--card);border:0.5px solid var(--border);border-radius:20px;padding:16px}
+.card2{background:var(--card2);border:0.5px solid var(--border);border-radius:16px;padding:14px}
+
+/* INPUTS */
+.inp{background:rgba(255,255,255,0.05);border:0.5px solid var(--border2);border-radius:13px;padding:15px;font-size:15px;color:#fff;font-family:inherit;outline:none;width:100%;transition:border-color 0.2s}
+.inp::placeholder{color:var(--t3)}
+.inp:focus{border-color:var(--blue)}
+
+/* ANIMATIONS */
+@keyframes gp{0%,100%{box-shadow:0 0 28px var(--blue-g),0 0 60px rgba(37,99,235,0.08)}50%{box-shadow:0 0 45px var(--blue-g),0 0 90px rgba(37,99,235,0.18)}}
+  @keyframes sRotate{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+  @keyframes sPulse{0%,100%{transform:scale(1);opacity:0.7}50%{transform:scale(1.08);opacity:1}}
+  @keyframes sDotPulse{0%,100%{transform:scale(1);box-shadow:0 0 18px var(--blue)}50%{transform:scale(1.15);box-shadow:0 0 32px var(--blue),0 0 60px rgba(37,99,235,0.3)}}
+@keyframes fi{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes bar{from{width:0}to{width:var(--w)}}
+.fi{animation:fi 0.5s ease forwards}
+.fi1{animation:fi 0.5s 0.1s ease forwards;opacity:0}
+.fi2{animation:fi 0.5s 0.2s ease forwards;opacity:0}
+.fi3{animation:fi 0.5s 0.3s ease forwards;opacity:0}
+.fi4{animation:fi 0.5s 0.4s ease forwards;opacity:0}
+
+/* SPLASH */
+#s1{justify-content:center;align-items:center}
+.sring{width:110px;height:110px;border-radius:50%;border:2px solid transparent;background:linear-gradient(var(--black),var(--black)) padding-box,linear-gradient(135deg,var(--blue-l),rgba(37,99,235,0.15),var(--blue-l)) border-box;display:flex;align-items:center;justify-content:center;animation:gp 3s ease-in-out infinite;margin-bottom:28px}
+.sring2{width:72px;height:72px;border-radius:50%;border:1.5px solid rgba(74,138,245,0.25);display:flex;align-items:center;justify-content:center}
+.sdot{width:22px;height:22px;border-radius:50%;background:var(--blue-l);box-shadow:0 0 18px var(--blue)}
+
+/* SECTION LABELS */
+.slabel{font-size:10.5px;font-weight:600;color:var(--t3);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:10px}
+
+/* PROGRESS BARS */
+.pbar-wrap{height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;margin-top:6px}
+.pbar{height:100%;border-radius:3px;animation:bar 1s 0.3s ease forwards;width:0}
+
+/* SCORE RING */
+.sring-wrap{position:relative;flex-shrink:0}
+.sring-wrap svg{transform:rotate(-90deg)}
+.sring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+
+/* CONN CARDS */
+.cc{background:var(--card);border:0.5px solid var(--border);border-radius:16px;padding:13px 15px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all 0.2s}
+.cc.on{border-color:rgba(37,99,235,0.2)}
+.cicon{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
+.ctog{width:42px;height:24px;border-radius:12px;background:rgba(255,255,255,0.1);flex-shrink:0;position:relative;transition:background 0.3s}
+.ctog::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform 0.25s;box-shadow:0 1px 3px rgba(0,0,0,0.3)}
+.ctog.on{background:var(--blue)}
+.ctog.on::after{transform:translateX(18px)}
+.cbtn{background:rgba(37,99,235,0.1);border:0.5px solid rgba(37,99,235,0.3);color:var(--blue-l);border-radius:18px;padding:5px 13px;font-size:12px;font-weight:500;white-space:nowrap;flex-shrink:0;cursor:pointer;font-family:inherit}
+
+/* CHAT */
+.qbtn{background:rgba(37,99,235,0.1);border:0.5px solid rgba(37,99,235,0.25);color:var(--blue-l);border-radius:18px;padding:7px 13px;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;font-family:inherit}
+.mbubble-bot{background:var(--card);border:0.5px solid var(--border);border-radius:16px 16px 16px 4px;padding:11px 13px;font-size:13px;color:var(--t2);line-height:1.6;max-width:76%}
+.mbubble-user{background:var(--blue);color:#fff;border-radius:16px 16px 4px 16px;padding:11px 13px;font-size:13px;line-height:1.6;max-width:76%}
+@keyframes tdot{0%,80%,100%{transform:scale(0.5);opacity:0.3}40%{transform:scale(1);opacity:1}}
+.td{width:5px;height:5px;border-radius:50%;background:var(--t2);animation:tdot 1.2s ease-in-out infinite}
+.td:nth-child(2){animation-delay:.15s}
+.td:nth-child(3){animation-delay:.3s}
+
+/* MIRROR / PATTERN CARDS */
+.pattern-card{border-radius:18px;padding:16px;margin-bottom:12px}
+.alert-bar{border-radius:12px;padding:12px 14px;display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+
+/* TIMELINE */
+.tl-item{display:flex;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--border);align-items:flex-start}
+.tl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.tl-time{font-size:11px;color:var(--t3);min-width:36px;font-weight:500;padding-top:2px}
+
+/* MINI BAR CHART */
+.mbc{display:flex;align-items:flex-end;gap:3px;height:36px}
+.mbb{flex:1;border-radius:2px 2px 0 0;min-height:3px}
+
+/* DONUT */
+.donut-wrap{display:flex;justify-content:center}
+
+
+
+
+
+  /* VOICE BUTTON IN TAB */
+  .tab{position:relative}
+  .voice-in-tab{position:absolute;top:-24px;left:50%;transform:translateX(-50%);z-index:10;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--blue),#5a3aed);border:2.5px solid var(--black);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 16px rgba(37,99,235,0.25);transition:transform 0.2s}
+  .voice-in-tab:active{transform:translateX(-50%) scale(0.9)}
+  .voice-in-tab svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+  /* VOICE ASSISTANT */
+  
+
+
+
+
+
+  /* VOICE OVERLAY */
+  .voice-overlay{position:absolute;inset:0;background:rgba(8,8,15,0.97);z-index:300;display:none;flex-direction:column;align-items:center;justify-content:center;backdrop-filter:blur(20px)}
+  .voice-overlay.open{display:flex}
+  .voice-close{position:absolute;top:56px;right:20px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.08);border:0.5px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);font-size:18px}
+  .voice-ring{width:140px;height:140px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative}
+  .voice-ring-outer{position:absolute;inset:0;border-radius:50%;border:1.5px solid rgba(37,99,235,0.2)}
+  .voice-ring-mid{position:absolute;inset:15px;border-radius:50%;border:1px solid rgba(37,99,235,0.15)}
+  .voice-ring-inner{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--blue),#5a3aed);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;box-shadow:0 0 30px rgba(37,99,235,0.3)}
+  .voice-ring-inner:active{transform:scale(0.9)}
+  .voice-ring-inner svg{stroke:#fff;fill:none;width:26px;height:26px;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  @keyframes ringPulse{0%,100%{transform:scale(1);opacity:0.2}50%{transform:scale(1.15);opacity:0.5}}
+  .voice-overlay.listening .voice-ring-outer{animation:ringPulse 2s ease-in-out infinite}
+  .voice-overlay.listening .voice-ring-mid{animation:ringPulse 2s 0.3s ease-in-out infinite}
+  @keyframes waveBar{0%,100%{height:4px}50%{height:var(--h)}}
+  .wave-bar{width:3px;border-radius:2px;background:var(--blue-l);animation:waveBar 0.8s ease-in-out infinite}
+
+  /* VOICE MESSAGES */
+  .voice-msgs{position:absolute;bottom:100px;left:24px;right:24px;max-height:240px;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
+  .voice-msg{border-radius:16px;padding:12px 14px;font-size:13px;line-height:1.6;max-width:85%}
+  .voice-msg.bot{background:var(--card);border:0.5px solid var(--border);color:var(--t2);align-self:flex-start}
+  .voice-msg.user{background:rgba(37,99,235,0.15);border:0.5px solid rgba(37,99,235,0.25);color:var(--blue-l);align-self:flex-end}
+
+  /* QUIZ */
+  .quiz-opt{background:var(--card);border:1.5px solid var(--border);border-radius:18px;padding:16px;cursor:pointer;transition:all 0.2s;text-align:center}
+  .quiz-opt:hover{border-color:var(--border2)}
+  .quiz-opt.selected{border-color:var(--blue);background:rgba(37,99,235,0.08)}
+  .quiz-opt.selected::after{content:'✓';position:absolute;top:10px;right:12px;font-size:13px;color:var(--blue-l)}
+  .quiz-opt{position:relative}
+</style>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBFpBuYCyA2oyrsgl-n9qdgx9Rjt4Opr1M",
+    authDomain: "lume-app-9b1a1.firebaseapp.com",
+    projectId: "lume-app-9b1a1",
+    storageBucket: "lume-app-9b1a1.firebasestorage.app",
+    messagingSenderId: "609176132692",
+    appId: "1:609176132692:web:1b7f87833070ecb76f21c1"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+</script>
+</head>
+<body>
+<div class="wrap">
+<div class="device" id="device">
+  <button class="nbtn nprev" onclick="go(-1)">‹</button>
+  <button class="nbtn nnext" onclick="go(1)">›</button>
+  <div class="nctr" id="ctr">1/15</div>
+
+  <!-- ═══ S1: SPLASH ═══ -->
+  <div class="screen active" id="s1">
+    <style>
+      @keyframes introLight{0%{width:4px;height:4px;opacity:1;box-shadow:0 0 8px rgba(37,99,235,0.6)}40%{width:18px;height:18px;opacity:1;box-shadow:0 0 50px rgba(37,99,235,0.5),0 0 100px rgba(37,99,235,0.2)}60%{width:180px;height:180px;opacity:0;box-shadow:0 0 120px rgba(37,99,235,0.3)}100%{width:200px;height:200px;opacity:0}}
+      @keyframes introRing1{0%,45%{transform:scale(0);opacity:0}60%{transform:scale(1.1);opacity:1}70%{transform:scale(1);opacity:1}100%{transform:scale(1);opacity:1}}
+      @keyframes introRing2{0%,50%{transform:scale(0);opacity:0}65%{transform:scale(1.1);opacity:1}75%{transform:scale(1);opacity:1}100%{transform:scale(1);opacity:1}}
+      @keyframes introRing3{0%,55%{transform:scale(0);opacity:0}70%{transform:scale(1.05);opacity:1}80%{transform:scale(1);opacity:1}100%{transform:scale(1);opacity:1}}
+      @keyframes introDot{0%,48%{transform:scale(0)}62%{transform:scale(1.2)}72%{transform:scale(1)}100%{transform:scale(1)}}
+      @keyframes introText{0%,72%{opacity:0;transform:translateY(12px)}85%{opacity:1;transform:translateY(0)}100%{opacity:1;transform:translateY(0)}}
+      @keyframes introTag{0%,78%{opacity:0;transform:translateY(12px)}90%{opacity:1;transform:translateY(0)}100%{opacity:1;transform:translateY(0)}}
+      @keyframes introCta{0%,85%{opacity:0;transform:translateY(20px)}95%{opacity:1;transform:translateY(0)}100%{opacity:1;transform:translateY(0)}}
+      @keyframes introLightHide{0%,58%{opacity:1}62%{opacity:0}100%{opacity:0}}
+      @keyframes introGlow{0%,40%{opacity:0}60%{opacity:1}100%{opacity:1}}
+    </style>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden">
+
+      <!-- Light point that grows and fades -->
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;animation:introLightHide 6s ease forwards">
+        <div style="width:4px;height:4px;border-radius:50%;background:#4a8af5;animation:introLight 6s ease forwards"></div>
+      </div>
+
+      <!-- Ambient glow -->
+      <div style="position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(37,99,235,0.08) 0%,transparent 70%);pointer-events:none;opacity:0;animation:introGlow 6s ease forwards"></div>
+
+      <!-- Logo rings -->
+      <div style="position:relative;width:130px;height:130px;margin-bottom:28px">
+        <div style="position:absolute;inset:0;border-radius:50%;border:1.5px solid transparent;border-top-color:#4a8af5;border-right-color:rgba(37,99,235,0.3);animation:introRing1 6s ease forwards, sRotate 8s 4s linear infinite"></div>
+        <div style="position:absolute;inset:12px;border-radius:50%;border:1px solid rgba(74,138,245,0.2);animation:introRing2 6s ease forwards, sPulse 3s 4s ease-in-out infinite"></div>
+        <div style="position:absolute;inset:24px;border-radius:50%;border:0.5px solid rgba(74,138,245,0.12);animation:introRing3 6s ease forwards"></div>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
+          <div style="width:22px;height:22px;border-radius:50%;background:#4a8af5;animation:introDot 6s ease forwards, sDotPulse 3s 4.5s ease-in-out infinite"></div>
+        </div>
+      </div>
+
+      <!-- Logo text -->
+      <div style="font-size:38px;font-weight:300;letter-spacing:8px;color:#fff;animation:introText 6s ease forwards;opacity:0">lume</div>
+
+      <!-- Tagline -->
+      <div style="margin-top:12px;font-size:15px;color:var(--t2);font-weight:300;letter-spacing:0.5px;animation:introTag 6s ease forwards;opacity:0">Seus hábitos, sem filtro.</div>
+
+    </div>
+
+    <!-- CTA buttons -->
+    <div style="padding:0 24px 48px;display:flex;flex-direction:column;gap:10px;animation:introCta 6s ease forwards;opacity:0">
+      <button class="btn" style="width:100%;height:52px" onclick="nav(2)">Começar</button>
+      <button class="btn-ghost" onclick="nav(3)">Já tenho uma conta</button>
+    </div>
+  </div>
+
+  <!-- ═══ S2: ONBOARDING ═══ -->
+  <div class="screen" id="s2">
+    <div class="sb"><span>9:41</span><span>●●●</span></div>
+    <div style="padding:20px 24px 0;flex-shrink:0">
+      <div style="display:flex;gap:5px;margin-bottom:18px">
+        <div style="height:3px;flex:1;border-radius:2px;background:var(--blue)"></div>
+        <div style="height:3px;flex:1;border-radius:2px;background:var(--border2)"></div>
+        <div style="height:3px;flex:1;border-radius:2px;background:var(--border2)"></div>
+      </div>
+      <div style="font-size:30px;font-weight:600;letter-spacing:-0.5px;line-height:1.2;margin-bottom:10px" class="fi">
+        Seu radar<br><span style="color:var(--blue-l)">comportamental.</span>
+      </div>
+      <div style="font-size:14px;color:var(--t2);line-height:1.65;margin-bottom:22px" class="fi1">
+        O Lume lê seu dia a dia — tempo em apps, locomoção, trabalho, saúde — e te mostra padrões que estão te impedindo de evoluir.
+      </div>
+    </div>
+    <div class="scroll" style="padding:0 24px 16px;display:flex;flex-direction:column;gap:12px">
+      <div class="card fi1" style="display:flex;gap:12px;align-items:flex-start">
+        <div style="width:40px;height:40px;border-radius:12px;background:rgba(37,99,235,0.06);border:0.5px solid rgba(37,99,235,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--blue-l)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        </div>
+        <div><div style="font-size:14px;font-weight:600;margin-bottom:3px">Análise de padrões</div><div style="font-size:12px;color:var(--t2);line-height:1.5">Entenda onde seu tempo realmente vai — sem suposições.</div></div>
+      </div>
+      <div class="card fi2" style="display:flex;gap:12px;align-items:flex-start">
+        <div style="width:40px;height:40px;border-radius:12px;background:rgba(239,79,96,0.06);border:0.5px solid rgba(239,79,96,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        </div>
+        <div><div style="font-size:14px;font-weight:600;margin-bottom:3px">Interrupção de loops</div><div style="font-size:12px;color:var(--t2);line-height:1.5">Detecta ciclos repetitivos que sabotam seus objetivos — e intervém antes.</div></div>
+      </div>
+      <div class="card fi3" style="display:flex;gap:12px;align-items:flex-start">
+        <div style="width:40px;height:40px;border-radius:12px;background:rgba(31,201,122,0.06);border:0.5px solid rgba(31,201,122,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <div><div style="font-size:14px;font-weight:600;margin-bottom:3px">Contexto geográfico</div><div style="font-size:12px;color:var(--t2);line-height:1.5">Reconhece onde você está e adapta os alertas ao ambiente.</div></div>
+      </div>
+      <div class="card fi4" style="display:flex;gap:12px;align-items:flex-start">
+        <div style="width:40px;height:40px;border-radius:12px;background:rgba(139,92,246,0.06);border:0.5px solid rgba(139,92,246,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        </div>
+        <div><div style="font-size:14px;font-weight:600;margin-bottom:3px">Leitura biométrica</div><div style="font-size:12px;color:var(--t2);line-height:1.5">Cruza dados de movimento, sono e frequência cardíaca com produtividade.</div></div>
+      </div>
+    </div>
+    <div style="padding:12px 24px 28px;flex-shrink:0">
+      <button class="btn" style="width:100%;height:52px" onclick="nav(3)">Continuar</button>
+    </div>
+  </div>
+
+  <!-- ═══ S3: SIGNUP ═══ -->
+  <div class="screen" id="s3">
+    <div class="sb"><span>9:41</span><span>●●●</span></div>
+    <div style="padding:16px 22px 14px;flex-shrink:0">
+      <div style="font-size:26px;font-weight:600;letter-spacing:-0.4px" class="fi">Crie sua conta</div>
+      <div style="font-size:13px;color:var(--t3);margin-top:4px" class="fi1">É rápido e seguro.</div>
+    </div>
+    <div class="scroll" style="padding:0 22px 20px;display:flex;flex-direction:column;gap:11px">
+      <button class="btn-out fi1" style="width:100%;height:50px;gap:9px" onclick="loginGoogle()">
+        <span style="width:18px;height:18px;background:#fff;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#333">G</span>
+        Continuar com Google
+      </button>
+      <button class="btn-out fi2" style="width:100%;height:50px;gap:9px" onclick="nav(16)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/><path d="M15 8.5c-.7-1-1.8-1.5-3-1.5-2.2 0-4 2-4 4.5s1.8 4.5 4 4.5c1.2 0 2.3-.6 3-1.5"/></svg> Continuar com Apple
+      </button>
+      <div style="display:flex;align-items:center;gap:10px;color:var(--t3);font-size:12px" class="fi2">
+        <div style="flex:1;height:0.5px;background:var(--border)"></div>ou<div style="flex:1;height:0.5px;background:var(--border)"></div>
+      </div>
+      <input class="inp fi2" placeholder="Nome completo" type="text">
+      <input class="inp fi3" placeholder="E-mail" type="email">
+      <div style="position:relative" class="fi3">
+        <input class="inp" placeholder="Senha" type="password" id="pw1">
+        <div style="position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--t3);cursor:pointer" onclick="tpw('pw1')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
+      </div>
+      <div style="display:flex;gap:9px;align-items:flex-start" class="fi4">
+        <div style="width:18px;height:18px;border-radius:5px;background:rgba(37,99,235,0.2);border:1px solid rgba(37,99,235,0.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div style="font-size:12px;color:var(--t3);line-height:1.5">Aceito os <span style="color:var(--blue-l)">Termos de Uso</span> e <span style="color:var(--blue-l)">Política de Privacidade</span></div>
+      </div>
+      <button class="btn fi4" style="width:100%;height:52px;margin-top:4px" onclick="nav(16)">Criar conta</button>
+      <div style="text-align:center;font-size:13px;color:var(--t3)">Já tem conta? <span style="color:var(--blue-l);cursor:pointer" onclick="nav(16)">Entrar</span></div>
+    </div>
+  </div>
+
+  <!-- ═══ S4: PLANOS ═══ -->
+  <div class="screen" id="s4">
+    <div class="sb"><span>9:41</span><span>●●●</span></div>
+    <div class="scroll" style="padding:16px 20px 24px">
+      <div class="fi" style="margin-bottom:6px;font-size:26px;font-weight:600;letter-spacing:-0.4px">Escolha seu plano</div>
+      <div class="fi1" style="font-size:13px;color:var(--t2);margin-bottom:20px">Acesso completo ao Lume Premium.</div>
+      <div class="fi1" style="display:inline-flex;background:rgba(255,255,255,0.06);border:0.5px solid var(--border2);color:var(--t2);font-size:10.5px;font-weight:500;padding:5px 12px;border-radius:20px;letter-spacing:0.3px;margin-bottom:10px">Mais escolhido</div>
+      <div style="background:var(--card2);border:0.5px solid var(--border2);border-radius:20px;padding:20px;margin-bottom:14px;position:relative;overflow:hidden" class="fi1">
+        
+        <div style="font-size:18px;font-weight:600;margin-bottom:8px">Premium Anual</div>
+        <div style="font-size:44px;font-weight:700;letter-spacing:-1.5px">R$<span style="font-size:30px">29</span>,90</div>
+        <div style="font-size:13px;color:var(--t2)">/ano · R$ 2,49 por mês</div>
+        <div style="display:flex;flex-direction:column;gap:9px;margin:16px 0">
+          <div style="display:flex;gap:9px;font-size:13px;color:var(--t2)"><span style="color:var(--t3)">✓</span> IA comportamental ilimitada</div>
+          <div style="display:flex;gap:9px;font-size:13px;color:var(--t2)"><span style="color:var(--t3)">✓</span> Radar de padrões em tempo real</div>
+          <div style="display:flex;gap:9px;font-size:13px;color:var(--t2)"><span style="color:var(--t3)">✓</span> Análise de local (casa / trabalho)</div>
+          <div style="display:flex;gap:9px;font-size:13px;color:var(--t2)"><span style="color:var(--t3)">✓</span> Saúde + movimento + sono</div>
+          <div style="display:flex;gap:9px;font-size:13px;color:var(--t2)"><span style="color:var(--t3)">✓</span> Alertas de quebra de padrão</div>
+          <div style="display:flex;gap:9px;font-size:13px;color:var(--t2)"><span style="color:var(--t3)">✓</span> Relatórios semanais detalhados</div>
+        </div>
+        <button class="btn" style="width:100%;height:50px" onclick="nav(5)">Assinar agora</button>
+      </div>
+      <div style="font-size:11px;color:var(--t3);text-align:center">7 dias grátis · Cancele quando quiser</div>
+    </div>
+  </div>
+
+  <!-- ═══ S5: PAGAMENTO ═══ -->
+  <div class="screen" id="s5">
+    <div class="sb"><span>9:41</span><span>●●●</span></div>
+    <div style="padding:8px 20px 14px;display:flex;align-items:center;gap:12px;flex-shrink:0">
+      <div style="width:34px;height:34px;border-radius:50%;background:var(--card);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);font-size:18px" onclick="go(-1)">←</div>
+      <div><div style="font-size:18px;font-weight:600">Pagamento seguro</div><div style="font-size:12px;color:var(--t3)">Finalize seu acesso.</div></div>
+    </div>
+    <div class="scroll" style="padding:0 20px 24px">
+      <div style="display:flex;background:var(--card);border-radius:11px;padding:3px;gap:2px;margin-bottom:18px">
+        <button class="seg on" id="segCard" onclick="selPay('card')" style="flex:1;padding:9px;border-radius:9px;border:none;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;background:var(--blue);color:#fff">Cartão</button>
+        <button class="seg" id="segPix" onclick="selPay('pix')" style="flex:1;padding:9px;border-radius:9px;border:none;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;background:transparent;color:var(--t2)">Pix</button>
+      </div>
+      <div id="cardF" style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px">
+        <div><div style="font-size:10.5px;color:var(--t3);font-weight:500;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.3px">Número do cartão</div><input class="inp" placeholder="1234 5678 9012 3456"></div>
+        <div><div style="font-size:10.5px;color:var(--t3);font-weight:500;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.3px">Nome no cartão</div><input class="inp" placeholder="Nome como impresso"></div>
+        <div style="display:flex;gap:10px">
+          <div style="flex:1"><div style="font-size:10.5px;color:var(--t3);font-weight:500;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.3px">Validade</div><input class="inp" placeholder="MM / AA"></div>
+          <div style="flex:1"><div style="font-size:10.5px;color:var(--t3);font-weight:500;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.3px">CVV</div><input class="inp" placeholder="123"></div>
+        </div>
+      </div>
+      <div style="background:var(--card);border:0.5px solid var(--border);border-radius:14px;padding:14px;margin-bottom:16px">
+        <div style="font-size:12px;font-weight:600;color:var(--t2);margin-bottom:8px">Resumo do pedido</div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--t2);margin-bottom:6px"><span>Plano Premium Anual</span><span>R$ 29,90</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:600;border-top:0.5px solid var(--border);padding-top:8px"><span>Total</span><span>R$ 29,90</span></div>
+      </div>
+      <button class="btn" style="width:100%;height:52px;margin-bottom:12px" onclick="nav(6)">Pagar R$ 29,90</button>
+      <div style="display:flex;gap:10px">
+        <div style="flex:1;background:var(--card);border:0.5px solid var(--border);border-radius:12px;padding:13px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;font-size:13px;font-weight:500;color:var(--t2)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/><path d="M15 8.5c-.7-1-1.8-1.5-3-1.5-2.2 0-4 2-4 4.5s1.8 4.5 4 4.5c1.2 0 2.3-.6 3-1.5"/></svg>
+          Apple Pay
+        </div>
+        <div style="flex:1;background:var(--card);border:0.5px solid var(--border);border-radius:12px;padding:13px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;font-size:13px;font-weight:500;color:var(--t2)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          Google Pay
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ S6: PRONTO ═══ -->
+  <div class="screen" id="s6" style="justify-content:center;align-items:center">
+    <div style="width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,0.03);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;margin-bottom:24px" class="fi">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <div style="font-size:30px;font-weight:600;letter-spacing:-0.4px;margin-bottom:10px;text-align:center" class="fi1">Tudo pronto!</div>
+    <div style="font-size:14px;color:var(--t2);text-align:center;line-height:1.65;max-width:270px" class="fi2">Seu acesso premium está liberado.<br><br>O Lume vai aprender seus padrões e te ajudar a mudar o que precisa mudar.</div>
+    <div style="position:absolute;bottom:40px;left:24px;right:24px">
+      <button class="btn" style="width:100%;height:52px" onclick="nav(7)">Começar agora</button>
+    </div>
+  </div>
+
+  <!-- ═══ S7: DASHBOARD PRINCIPAL ═══ -->
+  <div class="screen" id="s7">
+
+    <div class="sb"><span>9:41</span><span>●●●</span></div>
+    <div style="padding:8px 20px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <div>
+        <div style="font-size:22px;font-weight:600;letter-spacing:-0.3px" data-greeting>Bom dia, Rafael</div>
+        <div style="font-size:12px;color:var(--t3);margin-top:2px">Sexta-feira, 24 de maio</div>
+      </div>
+      <div style="width:36px;height:36px;border-radius:50%;background:var(--card);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;color:var(--t2)" data-initial>R</div>
+    </div>
+    <div class="scroll" style="padding:0 20px 16px">
+        <!-- SUPPORT BAR -->
+        <div onclick="nav(15)" style="display:flex;align-items:center;justify-content:space-between;background:rgba(37,99,235,0.07);border:0.5px solid rgba(37,99,235,0.18);border-radius:14px;padding:10px 14px;margin-bottom:14px;cursor:pointer;transition:all 0.2s">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;animation:supPulse 2.5s ease-in-out infinite"></div>
+            <div style="font-size:13px;font-weight:500;color:var(--t2)">Central de Suporte</div>
+            <div style="font-size:11px;color:var(--t3)">· Online agora · &lt;2 min</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;color:var(--blue-l)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span style="font-size:12px;font-weight:500">Falar</span>
+          </div>
+        </div>
+      <!-- CONTEXTUAL PHRASE -->
+      <div style="background:var(--card);border:0.5px solid var(--border);border-radius:14px;padding:14px;margin-bottom:14px;display:flex;gap:12px;align-items:flex-start" class="fi">
+        <div style="width:4px;border-radius:2px;background:var(--blue);flex-shrink:0;align-self:stretch"></div>
+        <div style="font-size:13px;color:var(--t2);line-height:1.6;font-style:italic" id="ctxPhrase">Ontem você resistiu ao Instagram e treinou. Hoje pode ser igual.</div>
+      </div>
+
+      <!-- STREAKS -->
+      <div class="slabel">Suas sequências</div>
+      <div style="display:flex;gap:10px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px">
+        <div style="min-width:140px;background:var(--card);border:0.5px solid var(--border);border-radius:16px;padding:14px;flex-shrink:0" class="fi1">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <div style="font-size:24px;font-weight:700">12</div>
+            <div style="font-size:10px;color:var(--green);font-weight:500;background:rgba(31,201,122,0.1);padding:3px 8px;border-radius:10px">ativo</div>
+          </div>
+          <div style="font-size:12px;font-weight:500;margin-bottom:2px">Sem Instagram pós-trabalho</div>
+          <div style="font-size:11px;color:var(--t3)">dias consecutivos</div>
+          <div style="display:flex;gap:2px;margin-top:8px">
+            <div style="width:6px;height:6px;border-radius:50%;background:var(--green)"></div>
+            <div style="width:6px;height:6px;border-radius:50%;background:var(--green)"></div>
+            <div style="width:6px;height:6px;border-radius:50%;background:var(--green)"></div>
+            <div style="width:6px;height:6px;border-radius:50%;background:var(--green)"></div>
+            <div style="width:6px;height:6px;border-radius:50%;background:var(--green)"></div>
+            <div style="width:6px;height:6px;border-radius:50%;background:var(--green)"></div>
+            <div style="width:6px;height:6px;border-radius:50%;background:var(--green)"></div>
+          </div>
+        </div>
+        <div style="min-width:140px;background:var(--card);border:0.5px solid var(--border);border-radius:16px;padding:14px;flex-shrink:0" class="fi1">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <div style="font-size:24px;font-weight:700">5</div>
+            <div style="font-size:10px;color:var(--blue-l);font-weight:500;background:rgba(37,99,235,0.1);padding:3px 8px;border-radius:10px">ativo</div>
+          </div>
+          <div style="font-size:12px;font-weight:500;margin-bottom:2px">Café antes das 14h</div>
+          <div style="font-size:11px;color:var(--t3)">dias consecutivos</div>
+          <div style="display:flex;gap:2px;margin-top:8px">
+            <div style="width:6px;height:6px;border-radius:50%;background:var(--blue-l)"></div>
+            <div style="width:6px;height:6px;border-radius:50%;background:var(--blue-l)"></div>
+            <div style="width:6px;height:6px;border-radius:50%;background:var(--blue-l)"></div>
+            <div style="width:6px;height:6px;border-radius:50%;background:var(--blue-l)"></div>
+            <div style="width:6px;height:6px;border-radius:50%;background:var(--blue-l)"></div>
+            <div style="width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.08)"></div>
+            <div style="width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.08)"></div>
+          </div>
+        </div>
+        <div style="min-width:140px;background:var(--card);border:0.5px solid var(--border);border-radius:16px;padding:14px;flex-shrink:0" class="fi2">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <div style="font-size:24px;font-weight:700">3</div>
+            <div style="font-size:10px;color:var(--orange);font-weight:500;background:rgba(245,160,32,0.1);padding:3px 8px;border-radius:10px">novo</div>
+          </div>
+          <div style="font-size:12px;font-weight:500;margin-bottom:2px">Treinou na semana</div>
+          <div style="font-size:11px;color:var(--t3)">esta semana</div>
+          <div style="display:flex;gap:2px;margin-top:8px">
+            <div style="width:6px;height:6px;border-radius:50%;background:var(--orange)"></div>
+            <div style="width:6px;height:6px;border-radius:50%;background:var(--orange)"></div>
+            <div style="width:6px;height:6px;border-radius:50%;background:var(--orange)"></div>
+            <div style="width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.08)"></div>
+            <div style="width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.08)"></div>
+            <div style="width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.08)"></div>
+            <div style="width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.08)"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUICK ACCESS -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+        <div onclick="nav(19)" class="card fi" style="cursor:pointer">
+          <div style="margin-bottom:6px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+          <div style="font-size:13px;font-weight:600">Desafios</div>
+          <div style="font-size:10.5px;color:var(--blue-l);margin-top:2px">1 ativo · 71%</div>
+        </div>
+        <div onclick="nav(21)" class="card fi" style="cursor:pointer">
+          <div style="margin-bottom:6px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+          <div style="font-size:13px;font-weight:600">Evolução</div>
+          <div style="font-size:10.5px;color:var(--green);margin-top:2px">+16 em 32 dias</div>
+        </div>
+        <div onclick="nav(13)" class="card fi" style="cursor:pointer">
+          <div style="margin-bottom:6px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>
+          <div style="font-size:13px;font-weight:600">Conexões</div>
+          <div style="font-size:10.5px;color:var(--t3);margin-top:2px">4 apps ativos</div>
+        </div>
+        <div onclick="nav(14)" class="card fi" style="cursor:pointer;border-color:rgba(239,79,96,0.2)">
+          <div style="margin-bottom:6px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></div>
+          <div style="font-size:13px;font-weight:600">Radar</div>
+          <div style="font-size:10.5px;color:var(--red);margin-top:2px">3 padrões detectados</div>
+        </div>
+      </div>
+      <!-- ALERTA CRÍTICO -->
+      <div style="background:rgba(239,79,96,0.08);border:0.5px solid rgba(239,79,96,0.22);border-radius:16px;padding:14px;margin-bottom:14px;display:flex;gap:12px;align-items:flex-start" class="fi1">
+        <div><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+        <div>
+          <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:3px">Padrão detectado agora</div>
+          <div style="font-size:12px;color:var(--t2);line-height:1.5">Você chegou em casa há 22 min. Nos últimos 14 dias, você abre Instagram nos primeiros 30 min em casa — e fica em média 1h18m. Se fizer agora, não vai treinar hoje.</div>
+          <button onclick="nav(14)" style="margin-top:10px;background:var(--red);border:none;color:#fff;border-radius:9px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">Ver padrão completo</button>
+        </div>
+      </div>
+      <!-- LIFE SCORE -->
+      <div class="card fi2" style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
+        <div class="sring-wrap" style="width:78px;height:78px">
+          <svg width="78" height="78" viewBox="0 0 78 78">
+            <circle cx="39" cy="39" r="32" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="6"/>
+            <circle cx="39" cy="39" r="32" fill="none" stroke="var(--blue)" stroke-width="6" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="44"/>
+          </svg>
+          <div class="sring-center"><div style="font-size:20px;font-weight:700">74</div><div style="font-size:9px;color:var(--t3)">/ 100</div></div>
+        </div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600;margin-bottom:8px">Life Score</div>
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--t3)">Foco</span><span style="color:#fff;font-weight:500">62%</span></div>
+            <div class="pbar-wrap"><div class="pbar" style="--w:62%;background:var(--blue)"></div></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-top:2px"><span style="color:var(--t3)">Saúde</span><span style="color:#fff;font-weight:500">80%</span></div>
+            <div class="pbar-wrap"><div class="pbar" style="--w:80%;background:var(--green)"></div></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-top:2px"><span style="color:var(--t3)">Hábitos</span><span style="color:#fff;font-weight:500">55%</span></div>
+            <div class="pbar-wrap"><div class="pbar" style="--w:55%;background:var(--orange)"></div></div>
+          </div>
+        </div>
+      </div>
+      <!-- HOJE EM NÚMEROS -->
+      <div class="slabel fi3">Hoje em números</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+        <div class="card fi3"><div style="font-size:10.5px;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.4px">Tela total</div><div style="font-size:24px;font-weight:700">4h 12m</div><div style="font-size:11px;color:var(--red);margin-top:2px">↑ 48m vs ontem</div></div>
+        <div class="card fi3"><div style="font-size:10.5px;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.4px">Movimento</div><div style="font-size:24px;font-weight:700">3.420</div><div style="font-size:11px;color:var(--t3);margin-top:2px">passos · meta 8k</div></div>
+        <div class="card fi4"><div style="font-size:10.5px;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.4px">Redes sociais</div><div style="font-size:24px;font-weight:700;color:var(--red)">1h 52m</div><div style="font-size:11px;color:var(--red);margin-top:2px">durante trabalho</div></div>
+        <div class="card fi4"><div style="font-size:10.5px;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.4px">Locomoção</div><div style="font-size:24px;font-weight:700">1h 38m</div><div style="font-size:11px;color:var(--t3);margin-top:2px">18km percorridos</div></div>
+      </div>
+    </div>
+    <div class="tab">
+      <div class="voice-in-tab" onclick="openVoice()"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg></div>
+      <div class="ti on" onclick="nav(7)"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg><span>Início</span></div>
+      <div class="ti" onclick="nav(9)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg><span>IA</span></div>
+      <div class="ti" onclick="nav(10)"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><span>Finanças</span></div>
+      <div class="ti" onclick="nav(11)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg><span>Foco</span></div>
+      <div class="ti" onclick="nav(13)"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><span>Mais</span></div>
+    </div>
+  </div>
+
+  <!-- ═══ S8: PAINEL DO DIA ═══ -->
+  <div class="screen" id="s8">
+
+    <div class="sb"><span>9:41</span><span>●●●</span></div>
+    <div style="padding:8px 20px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <div style="font-size:18px;font-weight:600">Painel do dia</div>
+      <div style="font-size:18px;color:var(--t2);cursor:pointer">⊞</div>
+    </div>
+    <div class="scroll" style="padding:0 20px 16px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div class="card fi"><div class="slabel">Energia mental</div><div style="font-size:22px;font-weight:700;color:var(--green)">72%</div><div style="font-size:11px;color:var(--t3)">Boa</div><div class="mbc" style="margin-top:8px"><div class="mbb" style="height:60%;background:rgba(31,201,122,0.3)"></div><div class="mbb" style="height:40%;background:rgba(31,201,122,0.3)"></div><div class="mbb" style="height:80%;background:rgba(31,201,122,0.3)"></div><div class="mbb" style="height:55%;background:rgba(31,201,122,0.3)"></div><div class="mbb" style="height:70%;background:rgba(31,201,122,0.5)"></div><div class="mbb" style="height:90%;background:rgba(31,201,122,0.7)"></div></div></div>
+        <div class="card fi1"><div class="slabel">Sono</div><div style="font-size:22px;font-weight:700;color:var(--blue-l)">7h 24m</div><div style="font-size:11px;color:var(--t3)">Qualidade boa</div><div class="mbc" style="margin-top:8px"><div class="mbb" style="height:50%;background:rgba(37,99,235,0.3)"></div><div class="mbb" style="height:75%;background:rgba(37,99,235,0.3)"></div><div class="mbb" style="height:65%;background:rgba(37,99,235,0.3)"></div><div class="mbb" style="height:85%;background:rgba(37,99,235,0.5)"></div><div class="mbb" style="height:70%;background:rgba(37,99,235,0.5)"></div><div class="mbb" style="height:80%;background:rgba(37,99,235,0.7)"></div></div></div>
+        <div class="card fi2"><div class="slabel">Trânsito</div><div style="font-size:22px;font-weight:700">1h 32m</div><div style="font-size:11px;color:var(--green)">Mais leve que ontem</div><div style="font-size:12px;color:var(--t3);margin-top:8px">deslocamento</div></div>
+        <div class="card fi3"><div class="slabel">Tempo de tela</div><div style="font-size:22px;font-weight:700">4h 12m</div><div style="font-size:11px;color:var(--red)">+48m que ontem</div><div style="font-size:12px;color:var(--t3);margin-top:8px">acima da média</div></div>
+      </div>
+      <div class="card fi3" style="margin-bottom:12px">
+        <div class="slabel">Próximos compromissos</div>
+        <div class="tl-item"><div class="tl-time">09:00</div><div class="tl-dot" style="background:var(--blue)"></div><div style="font-size:13px;font-weight:500">Reunião com equipe</div></div>
+        <div class="tl-item" style="border-bottom:none"><div class="tl-time">10:30</div><div class="tl-dot" style="background:var(--blue)"></div><div style="font-size:13px;font-weight:500">Call com cliente</div></div>
+      </div>
+    </div>
+    <div class="tab">
+      <div class="voice-in-tab" onclick="openVoice()"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg></div>
+      <div class="ti" onclick="nav(7)"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg><span>Início</span></div>
+      <div class="ti on" onclick="nav(9)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg><span>IA</span></div>
+      <div class="ti" onclick="nav(10)"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><span>Finanças</span></div>
+      <div class="ti" onclick="nav(11)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg><span>Foco</span></div>
+      <div class="ti" onclick="nav(13)"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><span>Mais</span></div>
+    </div>
+  </div>
+
+  <!-- ═══ S9: IA ASSISTENTE ═══ -->
+  <div class="screen" id="s9">
+
+    <div class="sb"><span>9:41</span><span>●●●</span></div>
+    <div style="padding:8px 20px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <div style="font-size:18px;font-weight:600">Assistente IA</div>
+      <div style="font-size:18px;color:var(--t2);cursor:pointer">⤡</div>
+    </div>
+    <div class="scroll" style="padding:0 20px 16px">
+      <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:16px" class="fi">
+        <div style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.04);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;margin-bottom:10px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg></div>
+        <div style="font-size:15px;font-weight:500">Bom dia, Rafael!</div>
+        <div style="font-size:12px;color:var(--t2);margin-top:3px">Aqui está o que preparei para você.</div>
+      </div>
+      <div class="card fi1" style="margin-bottom:12px">
+        <div style="font-size:10.5px;font-weight:600;color:var(--blue-l);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">Resumo inteligente</div>
+        <div style="display:flex;gap:8px;margin-bottom:8px;align-items:flex-start"><div style="width:4px;height:4px;border-radius:50%;background:var(--border2);margin-top:5px;flex-shrink:0"></div><div style="font-size:13px;color:var(--t2);line-height:1.5">Você tem 5 e-mails importantes para responder.</div></div>
+        <div style="display:flex;gap:8px;margin-bottom:8px;align-items:flex-start"><div style="width:4px;height:4px;border-radius:50%;background:var(--border2);margin-top:5px;flex-shrink:0"></div><div style="font-size:13px;color:var(--t2);line-height:1.5">Seu foco caiu 22% após 2h no Instagram ontem — padrão recorrente há 11 dias.</div></div>
+        <div style="display:flex;gap:8px;margin-bottom:8px;align-items:flex-start"><div style="width:4px;height:4px;border-radius:50%;background:var(--border2);margin-top:5px;flex-shrink:0"></div><div style="font-size:13px;color:var(--t2);line-height:1.5">Sugiro 2 blocos de foco hoje: 09:00–11:00 e 14:00–16:00.</div></div>
+        <div style="display:flex;gap:8px;align-items:flex-start"><div style="width:4px;height:4px;border-radius:50%;background:var(--border2);margin-top:5px;flex-shrink:0"></div><div style="font-size:13px;color:var(--t2);line-height:1.5">Você caminhou 400 passos a menos que ontem. Academia às 18h é possível hoje.</div></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px" class="fi2">
+        <button class="qbtn">Resumir e-mails</button>
+        <button class="qbtn">Organizar meu dia</button>
+        <button class="qbtn">Analisar padrões</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;background:var(--card);border:0.5px solid var(--border2);border-radius:22px;padding:8px 8px 8px 14px" class="fi3">
+        <input placeholder="Pergunte algo..." style="flex:1;background:transparent;border:none;outline:none;font-size:14px;color:#fff;font-family:inherit">
+        <div style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.06);border:0.5px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="1.8" stroke-linecap="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg></div>
+      </div>
+    </div>
+    <div class="tab">
+      <div class="voice-in-tab" onclick="openVoice()"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg></div>
+      <div class="ti" onclick="nav(7)"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg><span>Início</span></div>
+      <div class="ti on"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg><span>IA</span></div>
+      <div class="ti" onclick="nav(10)"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><span>Finanças</span></div>
+      <div class="ti" onclick="nav(11)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg><span>Foco</span></div>
+      <div class="ti" onclick="nav(13)"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><span>Mais</span></div>
+    </div>
+  </div>
+
+  <!-- ═══ S10: FINANÇAS ═══ -->
+  <div class="screen" id="s10">
+
+    <div class="sb"><span>9:41</span><span>●●●</span></div>
+    <div style="padding:8px 20px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <div style="font-size:18px;font-weight:600">Finanças</div>
+      <div style="font-size:18px;color:var(--t2);cursor:pointer">⊞</div>
+    </div>
+    <div class="scroll" style="padding:0 20px 16px">
+        <div onclick="nav(17)" class="cc" style="margin-bottom:12px;cursor:pointer">
+          <div class="cicon" style="background:#25D366"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
+          <div style="flex:1"><div style="font-size:14px;font-weight:500">Registrar gasto via WhatsApp</div><div style="font-size:11px;color:var(--t3);margin-top:1px">Texto ou foto · a IA categoriza</div></div>
+          <div style="color:var(--t3);font-size:16px">›</div>
+        </div>
+      <div class="card fi" style="margin-bottom:12px">
+        <div style="font-size:10.5px;color:var(--t3);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:12px;font-weight:500">Resumo do mês — Maio 2024</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:13px;color:var(--t3)">Receitas</span><span style="font-size:19px;font-weight:700;color:var(--green)">R$ 8.450,00</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><span style="font-size:13px;color:var(--t3)">Despesas</span><span style="font-size:19px;font-weight:700;color:var(--red)">R$ 5.320,40</span></div>
+        <div class="donut-wrap">
+          <svg width="110" height="110" viewBox="0 0 110 110">
+            <circle cx="55" cy="55" r="44" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="14"/>
+            <circle cx="55" cy="55" r="44" fill="none" stroke="#2563eb" stroke-width="14" stroke-dasharray="276.5" stroke-dashoffset="0" transform="rotate(-90 55 55)" style="stroke-dasharray:82.9 276.5"/>
+            <circle cx="55" cy="55" r="44" fill="none" stroke="#1fc97a" stroke-width="14" stroke-dasharray="276.5" stroke-dashoffset="-82.9" transform="rotate(-90 55 55)" style="stroke-dasharray:55.3 276.5"/>
+            <circle cx="55" cy="55" r="44" fill="none" stroke="#f5a020" stroke-width="14" stroke-dasharray="276.5" stroke-dashoffset="-138.2" transform="rotate(-90 55 55)" style="stroke-dasharray:41.5 276.5"/>
+            <circle cx="55" cy="55" r="44" fill="none" stroke="#ef4f60" stroke-width="14" stroke-dasharray="276.5" stroke-dashoffset="-179.7" transform="rotate(-90 55 55)" style="stroke-dasharray:27.6 276.5"/>
+            <circle cx="55" cy="55" r="44" fill="none" stroke="#8b5cf6" stroke-width="14" stroke-dasharray="276.5" stroke-dashoffset="-207.3" transform="rotate(-90 55 55)" style="stroke-dasharray:69.3 276.5"/>
+          </svg>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:9px;margin-top:12px">
+          <div style="display:flex;align-items:center;gap:9px"><div style="width:8px;height:8px;border-radius:50%;background:#2563eb;flex-shrink:0"></div><div style="font-size:13px;color:var(--t2);flex:1">Moradia</div><div style="font-size:12px;color:var(--t3)">30%</div><div style="font-size:13px;font-weight:600">R$ 1.596</div></div>
+          <div style="display:flex;align-items:center;gap:9px"><div style="width:8px;height:8px;border-radius:50%;background:#1fc97a;flex-shrink:0"></div><div style="font-size:13px;color:var(--t2);flex:1">Alimentação</div><div style="font-size:12px;color:var(--t3)">20%</div><div style="font-size:13px;font-weight:600">R$ 1.064</div></div>
+          <div style="display:flex;align-items:center;gap:9px"><div style="width:8px;height:8px;border-radius:50%;background:#f5a020;flex-shrink:0"></div><div style="font-size:13px;color:var(--t2);flex:1">Transporte</div><div style="font-size:12px;color:var(--t3)">15%</div><div style="font-size:13px;font-weight:600">R$ 798</div></div>
+          <div style="display:flex;align-items:center;gap:9px"><div style="width:8px;height:8px;border-radius:50%;background:#ef4f60;flex-shrink:0"></div><div style="font-size:13px;color:var(--t2);flex:1">Lazer</div><div style="font-size:12px;color:var(--t3)">10%</div><div style="font-size:13px;font-weight:600">R$ 532</div></div>
+          <div style="display:flex;align-items:center;gap:9px"><div style="width:8px;height:8px;border-radius:50%;background:#8b5cf6;flex-shrink:0"></div><div style="font-size:13px;color:var(--t2);flex:1">Outros</div><div style="font-size:12px;color:var(--t3)">25%</div><div style="font-size:13px;font-weight:600">R$ 1.329</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="tab">
+      <div class="voice-in-tab" onclick="openVoice()"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg></div>
+      <div class="ti" onclick="nav(7)"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg><span>Início</span></div>
+      <div class="ti" onclick="nav(9)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg><span>IA</span></div>
+      <div class="ti on"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><span>Finanças</span></div>
+      <div class="ti" onclick="nav(11)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg><span>Foco</span></div>
+      <div class="ti" onclick="nav(13)"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><span>Mais</span></div>
+    </div>
+  </div>
+
+  <!-- ═══ S11: FOCO & HÁBITOS ═══ -->
+  <div class="screen" id="s11">
+
+    <div class="sb"><span>9:41</span><span>●●●</span></div>
+    <div style="padding:8px 20px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <div style="font-size:18px;font-weight:600">Foco & Hábitos</div>
+      <div style="background:var(--card);border:0.5px solid var(--border);border-radius:9px;padding:5px 10px;font-size:12px;color:var(--t2);cursor:pointer">Hoje ▾</div>
+    </div>
+    <div class="scroll" style="padding:0 20px 16px">
+
+      <!-- ALERTAS INTELIGENTES -->
+      <div class="slabel">Alertas ativos agora</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+
+        <div style="background:rgba(245,160,32,0.09);border:0.5px solid rgba(245,160,32,0.28);border-radius:16px;padding:14px;display:flex;gap:12px;align-items:flex-start" class="fi">
+          <div style="flex-shrink:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg></div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:3px">Não tome café agora — 18:42</div>
+            <div style="font-size:12px;color:var(--t2);line-height:1.5">Você tomou café às 17h nos últimos 5 dias e dormiu em média 0h48m mais tarde. Seu sono perdeu 22% de qualidade. Último café recomendado: 14h.</div>
+            <div style="display:flex;gap:8px;margin-top:10px">
+              <button style="background:rgba(245,160,32,0.15);border:0.5px solid rgba(245,160,32,0.3);color:var(--orange);border-radius:9px;padding:6px 13px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit" onclick="this.textContent='✓ Anotado';this.style.color='var(--green)'">Entendido</button>
+              <button style="background:transparent;border:0.5px solid var(--border2);color:var(--t2);border-radius:9px;padding:6px 13px;font-size:12px;cursor:pointer;font-family:inherit">Ignorar</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:rgba(239,79,96,0.08);border:0.5px solid rgba(239,79,96,0.22);border-radius:16px;padding:14px;display:flex;gap:12px;align-items:flex-start" class="fi1">
+          <div style="flex-shrink:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:3px">Loop pós-trabalho detectado</div>
+            <div style="font-size:12px;color:var(--t2);line-height:1.5">Você chegou em casa há 18 min. Em 14 dos últimos 14 dias abriu Instagram e ficou 1h18m. Seu objetivo é treinar às 19h.</div>
+            <div style="display:flex;gap:8px;margin-top:10px">
+              <button onclick="this.textContent='✓ Bloqueado';this.style.color='var(--green)'" style="background:rgba(239,79,96,0.15);border:0.5px solid rgba(239,79,96,0.3);color:var(--red);border-radius:9px;padding:6px 13px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">Bloquear Instagram</button>
+              <button onclick="nav(11)" style="background:rgba(37,99,235,0.12);border:0.5px solid rgba(37,99,235,0.25);color:var(--blue-l);border-radius:9px;padding:6px 13px;font-size:12px;cursor:pointer;font-family:inherit">Treinar agora</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:rgba(139,92,246,0.08);border:0.5px solid rgba(139,92,246,0.22);border-radius:16px;padding:14px;display:flex;gap:12px;align-items:flex-start" class="fi2">
+          <div style="flex-shrink:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg></div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:3px">Você bebeu água hoje?</div>
+            <div style="font-size:12px;color:var(--t2);line-height:1.5">Nos dias em que você bebe menos água seu foco cai 18% e você passa mais tempo no celular. Última hidratação registrada: 12h.</div>
+            <button onclick="this.textContent='✓ Registrado';this.style.color='var(--green)'" style="margin-top:10px;background:rgba(139,92,246,0.12);border:0.5px solid rgba(139,92,246,0.25);color:#a78bfa;border-radius:9px;padding:6px 13px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">Bebi agora</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- MAPA DE HÁBITOS DO DIA -->
+      <div class="slabel">Mapa de hábitos · hoje</div>
+      <div class="card fi2" style="margin-bottom:14px">
+        <div style="display:flex;flex-direction:column;gap:0">
+          <div class="tl-item">
+            <div class="tl-time">06:30</div><div class="tl-dot" style="background:var(--green)"></div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:500">Acordou</div><div style="font-size:11px;color:var(--t3)">Sono: 7h24m · Qualidade: 68%</div></div>
+            <div style="font-size:11px;color:var(--green)">✓ bom</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-time">07:14</div><div class="tl-dot" style="background:var(--orange)"></div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:500">Instagram · 28 min</div><div style="font-size:11px;color:var(--t3)">Antes do café da manhã</div></div>
+            <div style="font-size:11px;color:var(--orange)">⚠ padrão</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-time">08:20</div><div class="tl-dot" style="background:var(--blue)"></div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:500">Saiu de casa</div><div style="font-size:11px;color:var(--t3)">Locomoção: 48 min</div></div>
+            <div style="font-size:11px;color:var(--blue-l)"> waze</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-time">09:08</div><div class="tl-dot" style="background:var(--green)"></div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:500">Chegou no trabalho</div><div style="font-size:11px;color:var(--t3)">8h45m no escritório</div></div>
+            <div style="font-size:11px;color:var(--green)"> detectado</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-time">10:34</div><div class="tl-dot" style="background:var(--red)"></div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:500">Instagram · 42 min</div><div style="font-size:11px;color:var(--t3)">Durante horário de trabalho</div></div>
+            <div style="font-size:11px;color:var(--red)">⚠ distração</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-time">13:10</div><div class="tl-dot" style="background:var(--green)"></div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:500">Almoço registrado</div><div style="font-size:11px;color:var(--t3)">via WhatsApp: "almocei fora, R$28"</div></div>
+            <div style="font-size:11px;color:var(--green)"> ok</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-time">17:02</div><div class="tl-dot" style="background:var(--orange)"></div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:500">Café — 17h02</div><div style="font-size:11px;color:var(--orange)">Atrasado 3h do recomendado</div></div>
+            <div style="font-size:11px;color:var(--orange)">⚠ sono</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-time">19:12</div><div class="tl-dot" style="background:var(--red)"></div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:500">Chegou em casa</div><div style="font-size:11px;color:var(--red)">Loop pós-trabalho iniciando...</div></div>
+            <div style="font-size:11px;color:var(--red)">⚠ agora</div>
+          </div>
+          <div class="tl-item" style="border-bottom:none;opacity:0.45">
+            <div class="tl-time">19:00</div><div class="tl-dot" style="background:var(--t3);border:1.5px dashed var(--t3);background:transparent"></div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:500;color:var(--t3)">Treino · previsto</div><div style="font-size:11px;color:var(--t3)">Objetivo: 3x por semana</div></div>
+            <div style="font-size:11px;color:var(--t3)">não feito</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TIMER FOCO -->
+      <div class="slabel">Sessão de foco</div>
+      <div class="card fi3" style="display:flex;align-items:center;gap:16px;margin-bottom:14px">
+        <div style="position:relative;width:70px;height:70px;flex-shrink:0">
+          <svg width="70" height="70" viewBox="0 0 70 70"><circle cx="35" cy="35" r="29" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="6"/><circle cx="35" cy="35" r="29" fill="none" stroke="var(--blue)" stroke-width="6" stroke-linecap="round" stroke-dasharray="182" stroke-dashoffset="36" transform="rotate(-90 35 35)"/></svg>
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><div style="font-size:15px;font-weight:700" id="ftimer">45:00</div></div>
+        </div>
+        <div style="flex:1">
+          <div style="font-size:14px;font-weight:600;margin-bottom:4px">Deep Work</div>
+          <div style="font-size:12px;color:var(--t3);margin-bottom:10px">2 sessões hoje · 1h30m total</div>
+          <button class="btn" style="height:36px;padding:0 18px;font-size:13px" id="fbtn" onclick="toggleFocus()">Iniciar</button>
+        </div>
+      </div>
+
+      <!-- PROGRESSO DOS OBJETIVOS -->
+      <div class="slabel">Seus objetivos</div>
+      <div style="display:flex;flex-direction:column;gap:10px" id="habitGoals">
+        <div class="card fi4" style="display:flex;gap:12px;align-items:center">
+          <div style="width:38px;height:38px;border-radius:11px;background:rgba(255,255,255,0.04);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="1.5" stroke-linecap="round"><path d="M6.5 6.5h11M4 10h1.5M18.5 10H20M4 14h1.5M18.5 14H20M6.5 17.5h11M7.5 6.5v11M16.5 6.5v11"/></svg></div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:600">Treinar 3x por semana</div><div style="font-size:11px;color:var(--t3);margin-top:1px">0 de 3 esta semana</div><div class="pbar-wrap" style="margin-top:5px"><div class="pbar" style="--w:0%;background:var(--green)"></div></div></div>
+          <div style="font-size:18px;color:var(--red)">—</div>
+        </div>
+        <div class="card fi4" style="display:flex;gap:12px;align-items:center">
+          <div style="width:38px;height:38px;border-radius:11px;background:rgba(255,255,255,0.04);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:600">Ler 20 min por dia</div><div style="font-size:11px;color:var(--t3);margin-top:1px">0 min hoje</div><div class="pbar-wrap" style="margin-top:5px"><div class="pbar" style="--w:0%;background:var(--blue)"></div></div></div>
+          <div style="font-size:18px;color:var(--red)">—</div>
+        </div>
+        <div class="card fi4" style="display:flex;gap:12px;align-items:center">
+          <div style="width:38px;height:38px;border-radius:11px;background:rgba(255,255,255,0.04);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="1.5" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:600">Redes sociais &lt; 1h/dia</div><div style="font-size:11px;color:var(--red);margin-top:1px">1h52m hoje — limite ultrapassado</div><div class="pbar-wrap" style="margin-top:5px"><div class="pbar" style="--w:100%;background:var(--red)"></div></div></div>
+          <div style="font-size:18px;color:var(--red)">⚠</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="tab">
+      <div class="voice-in-tab" onclick="openVoice()"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg></div>
+      <div class="ti" onclick="nav(7)"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg><span>Início</span></div>
+      <div class="ti" onclick="nav(9)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg><span>IA</span></div>
+      <div class="ti" onclick="nav(10)"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><span>Finanças</span></div>
+      <div class="ti on"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg><span>Foco</span></div>
+      <div class="ti" onclick="nav(13)"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><span>Mais</span></div>
+    </div>
+  </div>
+
+  <!-- ═══ S12: INSIGHTS ═══ -->
+  <div class="screen" id="s12">
+
+    <div class="sb"><span>9:41</span><span>●●●</span></div>
+    <div style="padding:8px 20px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <div style="font-size:18px;font-weight:600">Insights</div>
+      <div style="background:var(--card);border:0.5px solid var(--border);border-radius:9px;padding:5px 10px;font-size:12px;color:var(--t2);cursor:pointer">Esta semana ▾</div>
+    </div>
+    <div class="scroll" style="padding:0 20px 16px">
+      <div style="display:flex;gap:7px;margin-bottom:16px;overflow-x:auto">
+        <button style="padding:7px 14px;border-radius:18px;border:none;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;background:var(--blue);color:#fff;font-family:inherit">Resumo</button>
+        <button style="padding:7px 14px;border-radius:18px;border:0.5px solid var(--border);font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;background:var(--card);color:var(--t2);font-family:inherit">Foco</button>
+        <button style="padding:7px 14px;border-radius:18px;border:0.5px solid var(--border);font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;background:var(--card);color:var(--t2);font-family:inherit">Finanças</button>
+        <button style="padding:7px 14px;border-radius:18px;border:0.5px solid var(--border);font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;background:var(--card);color:var(--t2);font-family:inherit">Saúde</button>
+      </div>
+      <div class="card fi" style="margin-bottom:12px">
+        <div class="slabel">Produtividade</div>
+        <div style="font-size:13px;color:var(--green);margin-bottom:12px">↑ 18% comparado à semana passada</div>
+        <div style="display:flex;align-items:flex-end;gap:5px;height:72px">
+          <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:4px"><div style="border-radius:3px 3px 0 0;width:100%;background:rgba(37,99,235,0.25);height:42px"></div><div style="font-size:9.5px;color:var(--t3)">Seg</div></div>
+          <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:4px"><div style="border-radius:3px 3px 0 0;width:100%;background:rgba(37,99,235,0.25);height:52px"></div><div style="font-size:9.5px;color:var(--t3)">Ter</div></div>
+          <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:4px"><div style="border-radius:3px 3px 0 0;width:100%;background:rgba(37,99,235,0.25);height:36px"></div><div style="font-size:9.5px;color:var(--t3)">Qua</div></div>
+          <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:4px"><div style="border-radius:3px 3px 0 0;width:100%;background:rgba(37,99,235,0.25);height:58px"></div><div style="font-size:9.5px;color:var(--t3)">Qui</div></div>
+          <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:4px"><div style="border-radius:3px 3px 0 0;width:100%;background:var(--blue);height:66px"></div><div style="font-size:9.5px;color:var(--t3)">Sex</div></div>
+          <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:4px"><div style="border-radius:3px 3px 0 0;width:100%;background:rgba(37,99,235,0.2);height:28px"></div><div style="font-size:9.5px;color:var(--t3)">Sáb</div></div>
+          <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:4px"><div style="border-radius:3px 3px 0 0;width:100%;background:rgba(37,99,235,0.15);height:14px"></div><div style="font-size:9.5px;color:var(--t3)">Dom</div></div>
+        </div>
+      </div>
+      <div class="card fi1">
+        <div class="slabel">Tempo de tela</div>
+        <div style="font-size:32px;font-weight:700;letter-spacing:-1px">3h 15m</div>
+        <div style="font-size:12px;color:var(--t3);margin-top:2px">Média por dia</div>
+        <div style="font-size:12px;color:var(--red);margin-top:4px;display:flex;align-items:center;gap:4px">↓ 12% comparado à semana passada</div>
+      </div>
+    </div>
+    <div class="tab">
+      <div class="voice-in-tab" onclick="openVoice()"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg></div>
+      <div class="ti" onclick="nav(7)"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg><span>Início</span></div>
+      <div class="ti" onclick="nav(9)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg><span>IA</span></div>
+      <div class="ti" onclick="nav(10)"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><span>Finanças</span></div>
+      <div class="ti" onclick="nav(11)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg><span>Foco</span></div>
+      <div class="ti on" onclick="nav(13)"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><span>Mais</span></div>
+    </div>
+  </div>
+
+  <!-- ═══ S13: CONEXÕES ═══ -->
+  <div class="screen" id="s13">
+
+    <div class="sb"><span>9:41</span><span>●●●</span></div>
+    <div style="padding:8px 20px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <div style="font-size:18px;font-weight:600">Conexões</div>
+      <div style="font-size:12px;color:var(--blue-l);font-weight:500;cursor:pointer">+ Adicionar</div>
+    </div>
+    <div class="scroll" style="padding:0 20px 20px">
+      <div style="font-size:12px;color:var(--t3);margin-bottom:16px;line-height:1.6">O Lume lê seus dados de diferentes fontes para mapear o seu comportamento.</div>
+
+      <!-- LEITURA DO CELULAR (automática) -->
+      <div class="slabel">Leitura do celular · automática</div>
+      <div style="background:rgba(31,201,122,0.06);border:0.5px solid rgba(31,201,122,0.18);border-radius:16px;padding:14px;margin-bottom:18px">
+        <div style="font-size:12px;color:var(--t2);line-height:1.65;margin-bottom:12px">Esses dados vêm direto do seu celular — sem precisar conectar nenhum app. O Lume lê do sistema operacional.</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:11px">
+            <div style="width:36px;height:36px;border-radius:10px;background:rgba(31,201,122,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:500">Tempo de tela</div><div style="font-size:11px;color:var(--t3)">Quanto tempo em cada app (Instagram, TikTok, YouTube...)</div></div>
+            <div style="font-size:11px;color:var(--green);font-weight:500">Ativo</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:11px">
+            <div style="width:36px;height:36px;border-radius:10px;background:rgba(31,201,122,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:500">Localização (GPS)</div><div style="font-size:11px;color:var(--t3)">Detecta casa, trabalho, trânsito, academia</div></div>
+            <div style="font-size:11px;color:var(--green);font-weight:500">Ativo</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:11px">
+            <div style="width:36px;height:36px;border-radius:10px;background:rgba(31,201,122,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:500">Notificações</div><div style="font-size:11px;color:var(--t3)">Quantas vezes cada app te interrompe</div></div>
+            <div style="font-size:11px;color:var(--green);font-weight:500">Ativo</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONECTADOS -->
+      <div class="slabel">Conectados por você</div>
+      <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:18px">
+        <div class="cc on" onclick="togConn(this)"><div class="cicon" style="background:#25D366"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div><div style="flex:1"><div style="font-size:14px;font-weight:500">WhatsApp</div><div style="font-size:11px;color:var(--t3);margin-top:1px">Gastos, café, registros do dia a dia</div></div><div class="ctog on"></div></div>
+      </div>
+
+      <!-- DISPONÍVEIS PARA CONECTAR -->
+      <div class="slabel">Disponíveis para conectar</div>
+      <div style="font-size:11px;color:var(--t3);margin-bottom:10px;line-height:1.5">Esses apps oferecem acesso aos seus dados via API oficial.</div>
+      <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:18px">
+        <div class="cc" onclick="connApp(this)"><div class="cicon" style="background:linear-gradient(135deg,#EA4335,#FBBC04)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div><div style="flex:1"><div style="font-size:14px;font-weight:500">Gmail</div><div style="font-size:11px;color:var(--t3);margin-top:1px">E-mails importantes e alertas</div></div><button class="cbtn">Conectar</button></div>
+        <div class="cc" onclick="connApp(this)"><div class="cicon" style="background:linear-gradient(135deg,#1a73e8,#34a0f5)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div style="flex:1"><div style="font-size:14px;font-weight:500">Google Agenda</div><div style="font-size:11px;color:var(--t3);margin-top:1px">Compromissos e reuniões</div></div><button class="cbtn">Conectar</button></div>
+        <div class="cc" onclick="connApp(this)"><div class="cicon" style="background:#0078D4"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div><div style="flex:1"><div style="font-size:14px;font-weight:500">Outlook</div><div style="font-size:11px;color:var(--t3);margin-top:1px">E-mails e calendário Microsoft</div></div><button class="cbtn">Conectar</button></div>
+        <div class="cc" onclick="connApp(this)"><div class="cicon" style="background:linear-gradient(135deg,#96D048,#00C853)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div><div style="flex:1"><div style="font-size:14px;font-weight:500">Google Fit</div><div style="font-size:11px;color:var(--t3);margin-top:1px">Atividades e metas de movimento</div></div><button class="cbtn">Conectar</button></div>
+        <div class="cc" onclick="connApp(this)"><div class="cicon" style="background:linear-gradient(135deg,#ff2d55,#ff6b9d)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div><div style="flex:1"><div style="font-size:14px;font-weight:500">Apple Saúde</div><div style="font-size:11px;color:var(--t3);margin-top:1px">Passos, sono, frequência cardíaca</div></div><button class="cbtn">Conectar</button></div>
+        <div class="cc" onclick="connApp(this)"><div class="cicon" style="background:#00B0B9"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div><div style="flex:1"><div style="font-size:14px;font-weight:500">Fitbit</div><div style="font-size:11px;color:var(--t3);margin-top:1px">Atividades e qualidade de sono</div></div><button class="cbtn">Conectar</button></div>
+        <div class="cc" onclick="connApp(this)"><div class="cicon" style="background:#1DB954"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M8 15s1.5-2 4-2 4 2 4 2"/><path d="M7 11s2-2.5 5-2.5 5 2.5 5 2.5"/></svg></div><div style="flex:1"><div style="font-size:14px;font-weight:500">Spotify</div><div style="font-size:11px;color:var(--t3);margin-top:1px">Hábitos musicais e playlists de foco</div></div><button class="cbtn">Conectar</button></div>
+        <div class="cc" onclick="connApp(this)"><div class="cicon" style="background:#000"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div><div style="flex:1"><div style="font-size:14px;font-weight:500">Notion</div><div style="font-size:11px;color:var(--t3);margin-top:1px">Tarefas e organização pessoal</div></div><button class="cbtn">Conectar</button></div>
+      </div>
+
+      <!-- SEGURANÇA -->
+      <div style="background:rgba(37,99,235,0.07);border:0.5px solid rgba(37,99,235,0.18);border-radius:14px;padding:13px;display:flex;gap:10px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue-l)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <div style="font-size:12px;color:var(--t2);line-height:1.6">Seus dados ficam no seu celular. O Lume só lê o necessário e nunca compartilha com terceiros.</div>
+      </div>
+    </div>
+
+    <div class="tab">
+      <div class="voice-in-tab" onclick="openVoice()"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg></div>
+      <div class="ti" onclick="nav(7)"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg><span>Início</span></div>
+      <div class="ti" onclick="nav(9)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg><span>IA</span></div>
+      <div class="ti" onclick="nav(10)"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><span>Finanças</span></div>
+      <div class="ti" onclick="nav(11)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg><span>Foco</span></div>
+      <div class="ti on"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><span>Mais</span></div>
+    </div>
+  </div>
+
+  <!-- ═══ S14: RADAR DE PADRÕES ═══ -->
+  <div class="screen" id="s14">
+
+    <div class="sb"><span>9:41</span><span>●●●</span></div>
+    <div style="padding:8px 20px 12px;display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <div style="width:34px;height:34px;border-radius:50%;background:var(--card);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);font-size:18px" onclick="nav(7)">←</div>
+      <div style="font-size:18px;font-weight:600;flex:1">Radar de Padrões</div>
+      <div style="background:var(--card);border:0.5px solid var(--border);border-radius:9px;padding:5px 10px;font-size:12px;color:var(--t2);cursor:pointer">Hoje ▾</div>
+    </div>
+    <div class="scroll" style="padding:0 20px 20px">
+
+      <!-- PADRÃO CRÍTICO -->
+      <div style="background:rgba(239,79,96,0.08);border:0.5px solid rgba(239,79,96,0.25);border-radius:18px;padding:16px;margin-bottom:14px" class="fi">
+        <div style="font-size:10.5px;font-weight:600;color:var(--red);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">⚠ Padrão crítico · 14 dias consecutivos</div>
+        <div style="font-size:20px;font-weight:700;letter-spacing:-0.5px;margin-bottom:4px">Loop pós-trabalho</div>
+        <div style="font-size:12px;color:var(--t3);margin-bottom:12px">Detectado há 3 min</div>
+        <div style="background:rgba(0,0,0,0.25);border-radius:12px;padding:12px;margin-bottom:12px">
+          <div style="font-size:13px;color:var(--t2);line-height:1.7">→ Chegou em casa (19:12) → → Abriu Instagram (19:18) → → Ficou 1h18m → → Não treinou</div>
+          <div style="font-size:11px;color:var(--t3);margin-top:6px">Este loop aconteceu nos últimos 14 dias. Você quer treinar às 19h.</div>
+        </div>
+        <!-- mini chart -->
+        <div style="display:flex;align-items:flex-end;gap:3px;height:38px;margin-bottom:5px">
+          <div style="flex:1;border-radius:2px 2px 0 0;background:rgba(37,99,235,0.3);height:50%"></div>
+          <div style="flex:1;border-radius:2px 2px 0 0;background:rgba(37,99,235,0.2);height:30%"></div>
+          <div style="flex:1;border-radius:2px 2px 0 0;background:rgba(239,79,96,0.6);height:75%"></div>
+          <div style="flex:1;border-radius:2px 2px 0 0;background:rgba(239,79,96,0.9);height:100%"></div>
+          <div style="flex:1;border-radius:2px 2px 0 0;background:rgba(239,79,96,0.55);height:60%"></div>
+          <div style="flex:1;border-radius:2px 2px 0 0;background:rgba(37,99,235,0.2);height:20%"></div>
+          <div style="flex:1;border-radius:2px 2px 0 0;background:rgba(255,255,255,0.06);height:10%"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3);margin-bottom:12px"><span>08h</span><span style="color:var(--red)">10h ⚠</span><span>13h</span><span style="color:var(--red)">19h </span><span>agora</span></div>
+        <div style="display:flex;gap:8px">
+          <button onclick="blockNow(this)" style="flex:1;background:var(--red);border:none;color:#fff;border-radius:10px;padding:10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">Bloquear Instagram</button>
+          <button onclick="nav(11)" style="background:rgba(37,99,235,0.12);border:0.5px solid rgba(37,99,235,0.3);color:var(--blue-l);border-radius:10px;padding:10px 13px;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap">Treinar agora</button>
+        </div>
+      </div>
+
+      <!-- REDES NO TRABALHO -->
+      <div class="card fi1" style="margin-bottom:14px">
+        <div class="slabel">Redes sociais durante trabalho</div>
+        <div style="margin-bottom:13px">
+          <div style="display:flex;align-items:center;gap:9px;margin-bottom:5px">
+            <div style="width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);display:flex;align-items:center;justify-content:center;font-size:13px"></div>
+            <div style="font-size:13px;flex:1">Instagram</div>
+            <div style="font-size:14px;font-weight:700;color:var(--red)">1h 22m</div>
+          </div>
+          <div class="pbar-wrap"><div class="pbar" style="--w:72%;background:var(--red)"></div></div>
+          <div style="font-size:10.5px;color:var(--t3);margin-top:3px">72% do tempo de distração</div>
+        </div>
+        <div>
+          <div style="display:flex;align-items:center;gap:9px;margin-bottom:5px">
+            <div style="width:26px;height:26px;border-radius:7px;background:#25D366;display:flex;align-items:center;justify-content:center;font-size:13px"></div>
+            <div style="font-size:13px;flex:1">WhatsApp pessoal</div>
+            <div style="font-size:14px;font-weight:700;color:var(--orange)">34m</div>
+          </div>
+          <div class="pbar-wrap"><div class="pbar" style="--w:30%;background:var(--orange)"></div></div>
+        </div>
+      </div>
+
+      <!-- ONDE FICOU -->
+      <div class="card fi2" style="margin-bottom:14px">
+        <div class="slabel">Onde você passou o dia</div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px">
+          <div style="display:flex;align-items:center;gap:10px"><div style="width:8px;height:8px;border-radius:50%;background:var(--blue);flex-shrink:0"></div><div style="font-size:13px;color:var(--t2);flex:1">Trabalho — Av. Paulista</div><div style="font-size:13px;font-weight:600">8h 45m</div></div>
+          <div style="display:flex;align-items:center;gap:10px"><div style="width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0"></div><div style="font-size:13px;color:var(--t2);flex:1">Casa</div><div style="font-size:13px;font-weight:600">1h 22m</div></div>
+          <div style="display:flex;align-items:center;gap:10px"><div style="width:8px;height:8px;border-radius:50%;background:var(--orange);flex-shrink:0"></div><div style="font-size:13px;color:var(--t2);flex:1">Locomoção</div><div style="font-size:13px;font-weight:600">1h 38m</div></div>
+          <div style="display:flex;align-items:center;gap:10px"><div style="width:8px;height:8px;border-radius:50%;background:var(--t3);flex-shrink:0"></div><div style="font-size:13px;color:var(--t2);flex:1">Outros</div><div style="font-size:13px;font-weight:600">42m</div></div>
+        </div>
+      </div>
+
+      <!-- SAÚDE -->
+      <div class="card fi3" style="margin-bottom:14px">
+        <div class="slabel">Saúde e movimento</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px">
+          <div><div style="font-size:22px;font-weight:700">3.420</div><div style="font-size:11px;color:var(--t3)">passos · meta 8k</div><div class="pbar-wrap" style="margin-top:5px"><div class="pbar" style="--w:43%;background:var(--orange)"></div></div></div>
+          <div><div style="font-size:22px;font-weight:700">7h 24m</div><div style="font-size:11px;color:var(--t3)">sono</div><div class="pbar-wrap" style="margin-top:5px"><div class="pbar" style="--w:82%;background:var(--green)"></div></div></div>
+          <div><div style="font-size:22px;font-weight:700;color:var(--red)">0</div><div style="font-size:11px;color:var(--t3)">treinos esta semana</div></div>
+          <div><div style="font-size:22px;font-weight:700">72 bpm</div><div style="font-size:11px;color:var(--t3)">freq. cardíaca</div></div>
+        </div>
+      </div>
+
+      <!-- IA -->
+      <div style="background:rgba(37,99,235,0.07);border:0.5px solid rgba(37,99,235,0.2);border-radius:18px;padding:16px" class="fi4">
+        <div style="font-size:13px;font-weight:600;margin-bottom:8px">Recomendação da IA</div>
+        <div style="font-size:12px;color:var(--t2);line-height:1.65;margin-bottom:12px">Você chega em casa com energia disponível. O obstáculo não é cansaço — é o hábito de abrir o Instagram. Se agir nos próximos 8 minutos, a probabilidade de treinar hoje sobe para 78%.</div>
+        <button onclick="nav(11)" style="width:100%;background:var(--blue);border:none;color:#fff;border-radius:11px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Iniciar treino agora</button>
+      </div>
+    </div>
+    <div class="tab">
+      <div class="voice-in-tab" onclick="openVoice()"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg></div>
+      <div class="ti" onclick="nav(7)"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg><span>Início</span></div>
+      <div class="ti" onclick="nav(9)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg><span>IA</span></div>
+      <div class="ti" onclick="nav(10)"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><span>Finanças</span></div>
+      <div class="ti" onclick="nav(11)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg><span>Foco</span></div>
+      <div class="ti on"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><span>Mais</span></div>
+    </div>
+  </div>
+
+  <!-- S15: CENTRAL DE SUPORTE -->
+  <div class="screen" id="s15">
+    <div class="sb"><span>9:41</span><span>●●●</span></div>
+
+    <!-- HEADER -->
+    <div style="padding:0 18px 12px;display:flex;align-items:center;gap:12px;border-bottom:0.5px solid var(--border);flex-shrink:0">
+      <div style="width:34px;height:34px;border-radius:50%;background:var(--card);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);font-size:18px" onclick="history.back()||nav(7)">←</div>
+      <div style="position:relative;flex-shrink:0">
+        <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#2d6ef7,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:19px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3"/></svg></div>
+        <div style="position:absolute;bottom:1px;right:1px;width:10px;height:10px;border-radius:50%;background:var(--green);border:2px solid var(--black)"></div>
+      </div>
+      <div style="flex:1">
+        <div style="font-size:15px;font-weight:600">Suporte Lume</div>
+        <div style="font-size:11px;color:var(--green)">● Online agora · resposta em &lt;2 min</div>
+      </div>
+      <div style="font-size:19px;color:var(--t3);cursor:pointer">⋮</div>
+    </div>
+
+    <!-- MESSAGES AREA -->
+    <div class="scroll" style="padding:14px 16px 10px;display:flex;flex-direction:column;gap:12px" id="chatMsgs">
+
+      <div style="text-align:center;font-size:10.5px;color:var(--t3);padding:4px 0">Hoje · 09:41</div>
+
+      <!-- Bot welcome -->
+      <div style="display:flex;gap:10px;align-items:flex-end">
+        <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#2d6ef7,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3"/></svg></div>
+        <div style="max-width:78%">
+          <div style="background:var(--card);border:0.5px solid var(--border);border-radius:16px 16px 16px 4px;padding:12px 14px;font-size:13px;color:var(--t2);line-height:1.6">
+            Olá, sou o assistente do Lume.<br>Como posso te ajudar agora?
+          </div>
+          <div style="font-size:10px;color:var(--t3);margin-top:4px;padding-left:2px">09:41</div>
+        </div>
+      </div>
+
+      <!-- Quick replies -->
+      <div style="display:flex;flex-wrap:wrap;gap:8px;padding-left:40px" id="qreplies">
+        <button onclick="qsend('Problema com pagamento')" class="qbtn">Pagamento</button>
+        <button onclick="qsend('Não consigo conectar um app')" class="qbtn">Conexões</button>
+        <button onclick="qsend('Como funciona o Radar de Padrões?')" class="qbtn">Padrões</button>
+        <button onclick="qsend('Quero cancelar meu plano')" class="qbtn">Cancelar plano</button>
+        <button onclick="qsend('Como registro gastos pelo WhatsApp?')" class="qbtn">Gastos</button>
+      </div>
+
+    </div>
+
+    <!-- INPUT BAR -->
+    <div style="padding:10px 16px 28px;flex-shrink:0;border-top:0.5px solid var(--border);background:rgba(8,8,16,0.95)">
+      <div style="display:flex;align-items:center;gap:10px;background:var(--card);border:0.5px solid var(--border2);border-radius:24px;padding:9px 9px 9px 16px">
+        <input id="chatInp" placeholder="Digite sua mensagem..." style="flex:1;background:transparent;border:none;outline:none;font-size:14px;color:#fff;font-family:inherit" onkeydown="if(event.key==='Enter')csend()">
+        <button onclick="csend()" style="width:36px;height:36px;border-radius:50%;background:var(--blue);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all 0.2s">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13" stroke="#fff"/><polygon points="22 2 15 22 11 13 2 9 22 2" fill="#fff"/></svg>
+        </button>
+      </div>
+      <div style="text-align:center;font-size:10.5px;color:var(--t3);margin-top:7px">Tempo médio de resposta: menos de 2 min</div>
+    </div>
+  </div>
+
+
+  <!-- ═══ S16: QUIZ OBJETIVOS ═══ -->
+  <div class="screen" id="s16">
+    <div class="sb"><span>9:41</span><span>●●●</span></div>
+    <div style="padding:16px 22px 0;flex-shrink:0">
+      <div style="display:flex;gap:5px;margin-bottom:16px">
+        <div style="height:3px;flex:1;border-radius:2px;background:var(--blue)"></div>
+        <div style="height:3px;flex:1;border-radius:2px;background:var(--blue)"></div>
+        <div style="height:3px;flex:1;border-radius:2px;background:var(--border2)"></div>
+      </div>
+      <div style="font-size:26px;font-weight:600;letter-spacing:-0.4px;margin-bottom:6px" class="fi">O que você quer<br><span style="color:var(--blue-l)">mudar na sua vida?</span></div>
+      <div style="font-size:13px;color:var(--t3);margin-bottom:20px;line-height:1.5" class="fi1">O Lume cria alertas personalizados para os seus objetivos. Escolha até 3.</div>
+    </div>
+    <div class="scroll" style="padding:0 20px 20px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px" id="quizGrid">
+        <div class="quiz-opt fi1" onclick="toggleGoal(this,'treinar')"><div style="margin-bottom:8px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="1.5" stroke-linecap="round"><path d="M6.5 6.5h11M4 10h1.5M18.5 10H20M4 14h1.5M18.5 14H20M6.5 17.5h11M7.5 6.5v11M16.5 6.5v11"/></svg></div><div style="font-size:13px;font-weight:600">Treinar</div><div style="font-size:11px;color:var(--t3);margin-top:2px;line-height:1.4">Criar hábito de exercício</div></div>
+        <div class="quiz-opt fi1" onclick="toggleGoal(this,'ler')"><div style="margin-bottom:8px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div><div style="font-size:13px;font-weight:600">Ler mais</div><div style="font-size:11px;color:var(--t3);margin-top:2px;line-height:1.4">Substituir tela por leitura</div></div>
+        <div class="quiz-opt fi2" onclick="toggleGoal(this,'redes')"><div style="margin-bottom:8px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="1.5" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div><div style="font-size:13px;font-weight:600">Menos redes</div><div style="font-size:11px;color:var(--t3);margin-top:2px;line-height:1.4">Reduzir tempo em apps</div></div>
+        <div class="quiz-opt fi2" onclick="toggleGoal(this,'custos')"><div style="margin-bottom:8px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div style="font-size:13px;font-weight:600">Reduzir custos</div><div style="font-size:11px;color:var(--t3);margin-top:2px;line-height:1.4">Controle financeiro</div></div>
+        <div class="quiz-opt fi3" onclick="toggleGoal(this,'alcool')"><div style="margin-bottom:8px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="1.5" stroke-linecap="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V8z"/></svg></div><div style="font-size:13px;font-weight:600">Parar com álcool</div><div style="font-size:11px;color:var(--t3);margin-top:2px;line-height:1.4">Reduzir ou eliminar</div></div>
+        <div class="quiz-opt fi3" onclick="toggleGoal(this,'porno')"><div style="margin-bottom:8px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></div><div style="font-size:13px;font-weight:600">Conteúdo adulto</div><div style="font-size:11px;color:var(--t3);margin-top:2px;line-height:1.4">Reduzir dependência</div></div>
+        <div class="quiz-opt fi4" onclick="toggleGoal(this,'sono')"><div style="margin-bottom:8px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div><div style="font-size:13px;font-weight:600">Dormir melhor</div><div style="font-size:11px;color:var(--t3);margin-top:2px;line-height:1.4">Qualidade do sono</div></div>
+        <div class="quiz-opt fi4" onclick="toggleGoal(this,'foco')"><div style="margin-bottom:8px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div><div style="font-size:13px;font-weight:600">Mais foco</div><div style="font-size:11px;color:var(--t3);margin-top:2px;line-height:1.4">Produtividade real</div></div>
+      </div>
+      <div style="background:rgba(37,99,235,0.07);border:0.5px solid rgba(37,99,235,0.18);border-radius:14px;padding:13px;margin-bottom:18px;display:flex;gap:10px">
+        <div style="font-size:17px"></div>
+        <div style="font-size:12px;color:var(--t2);line-height:1.6">O Lume aprende seus padrões e cria alertas antes que o loop aconteça.</div>
+      </div>
+      <div id="quizCount" style="text-align:center;font-size:13px;color:var(--t3);margin-bottom:12px">Selecione ao menos 1 objetivo</div>
+      <button class="btn" style="width:100%;height:52px;opacity:0.4;pointer-events:none" id="quizBtn" onclick="saveGoals();nav(18)">Continuar</button>
+    </div>
+  </div>
+
+  <!-- ═══ S17: GASTOS WHATSAPP ═══ -->
+  <div class="screen" id="s17">
+    <div class="sb"><span>9:41</span><span>●●●</span></div>
+    <div style="padding:8px 20px 10px;display:flex;align-items:center;gap:11px;border-bottom:0.5px solid var(--border);flex-shrink:0">
+      <div style="width:32px;height:32px;border-radius:50%;background:var(--card);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);font-size:17px" onclick="nav(10)">←</div>
+      <div style="position:relative;flex-shrink:0">
+        <div style="width:36px;height:36px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;font-size:18px"></div>
+        <div style="position:absolute;bottom:0;right:0;width:9px;height:9px;border-radius:50%;background:var(--green);border:1.5px solid var(--black)"></div>
+      </div>
+      <div style="flex:1"><div style="font-size:14px;font-weight:600">Lume · Gastos</div><div style="font-size:11px;color:var(--green)">Texto ou foto do comprovante</div></div>
+    </div>
+    <div class="scroll" style="padding:12px 14px 8px;display:flex;flex-direction:column;gap:11px" id="gastosMsg">
+      <div style="text-align:center;font-size:10.5px;color:var(--t3)">Hoje · 13:10</div>
+      <div style="display:flex;gap:8px;align-items:flex-end">
+        <div style="width:28px;height:28px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0"></div>
+        <div class="mbubble-bot" style="background:rgba(37,211,102,0.08);border-color:rgba(37,211,102,0.2)">Oi!  Registre seus gastos naturalmente ou envie foto do comprovante.<br><br><strong>"café R$8"</strong> · <strong>"uber R$14"</strong> · <strong>"mercado R$120"</strong><br> Foto de nota ou comprovante</div>
+      </div>
+      <div style="display:flex;justify-content:flex-end"><div class="mbubble-user" style="background:rgba(37,211,102,0.65)">almocei fora, R$28</div></div>
+      <div style="display:flex;gap:8px;align-items:flex-end">
+        <div style="width:28px;height:28px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0"></div>
+        <div class="mbubble-bot" style="background:rgba(37,211,102,0.08);border-color:rgba(37,211,102,0.2)">✓ Registrado! ·<br><strong>Alimentação · R$ 28,00</strong><br>13:10 · Hoje<br><br> Meta mensal: 68% utilizada</div>
+      </div>
+      <div style="background:var(--card);border:0.5px solid var(--border);border-radius:14px;padding:12px">
+        <div style="font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:10px">Resumo de hoje</div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:var(--t2)">Alimentação</span><span style="font-weight:600">R$ 28,00</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:var(--t2)">Transporte</span><span style="font-weight:600">R$ 14,50</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;border-top:0.5px solid var(--border);padding-top:8px;font-weight:600"><span>Total hoje</span><span style="color:var(--orange)">R$ 42,50</span></div>
+      </div>
+    </div>
+    <div style="padding:8px 14px 22px;background:rgba(8,8,16,0.96);border-top:0.5px solid var(--border);flex-shrink:0">
+      <div style="display:flex;align-items:center;gap:8px;background:rgba(37,211,102,0.08);border:0.5px solid rgba(37,211,102,0.25);border-radius:22px;padding:7px 7px 7px 13px">
+        <input id="gastosInp" placeholder="Ex: café R$8, mercado R$120..." style="flex:1;background:transparent;border:none;outline:none;font-size:14px;color:#fff;font-family:inherit" onkeydown="if(event.key==='Enter')sendGasto()">
+        <button onclick="sendFoto()" style="width:32px;height:32px;border-radius:50%;background:rgba(37,211,102,0.15);border:0.5px solid rgba(37,211,102,0.3);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:15px"></button>
+        <button onclick="sendGasto()" style="width:34px;height:34px;border-radius:50%;background:#25D366;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0">
+          <svg width="14" height="14" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/><polygon points="22 2 15 22 11 13 2 9 22 2" fill="#fff"/></svg>
+        </button>
+      </div>
+      <div style="text-align:center;font-size:10.5px;color:var(--t3);margin-top:6px">Texto ou foto · a IA categoriza automaticamente</div>
+    </div>
+  </div>
+
+  <!-- ═══ S18: ENDEREÇOS ═══ -->
+  <div class="screen" id="s18">
+    <div class="sb"><span>9:41</span><span>●●●</span></div>
+    <div style="padding:16px 22px 0;flex-shrink:0">
+      <div style="display:flex;gap:5px;margin-bottom:16px">
+        <div style="height:3px;flex:1;border-radius:2px;background:var(--blue)"></div>
+        <div style="height:3px;flex:1;border-radius:2px;background:var(--blue)"></div>
+        <div style="height:3px;flex:1;border-radius:2px;background:var(--blue)"></div>
+      </div>
+      <div style="font-size:26px;font-weight:600;letter-spacing:-0.4px;margin-bottom:6px" class="fi">Onde você mora<br><span style="color:var(--blue-l)">e trabalha?</span></div>
+      <div style="font-size:13px;color:var(--t3);margin-bottom:22px;line-height:1.5" class="fi1">O Lume detecta automaticamente quando você está em casa, no trabalho ou em trânsito — sem você precisar avisar.</div>
+    </div>
+    <div class="scroll" style="padding:0 22px 24px">
+      <!-- MORADIA -->
+      <div class="fi1" style="margin-bottom:20px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div style="width:36px;height:36px;border-radius:10px;background:rgba(31,201,122,0.12);border:0.5px solid rgba(31,201,122,0.25);display:flex;align-items:center;justify-content:center;font-size:18px"></div>
+          <div><div style="font-size:15px;font-weight:600">Onde você mora</div><div style="font-size:11px;color:var(--t3)">Detecta chegada e monitora hábitos noturnos</div></div>
+        </div>
+        <div style="position:relative;margin-bottom:8px">
+          <input class="inp" id="endCasa" placeholder="Endereço ou CEP (ex: 01310-100)" type="text" oninput="searchAddr('casa',this.value)">
+          <div style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--t3)"></div>
+        </div>
+        <div style="font-size:11px;color:var(--t3);margin-top:5px;margin-left:2px"> Pode digitar o CEP direto — ex: <span style="color:var(--blue-l)">01310-100</span></div>
+        <div id="sugCasa" style="display:none;background:var(--card2);border:0.5px solid var(--border2);border-radius:12px;overflow:hidden;margin-bottom:6px;max-height:200px;overflow-y:auto"></div>
+        <div id="casaConfirm" style="display:none;background:rgba(31,201,122,0.08);border:0.5px solid rgba(31,201,122,0.25);border-radius:12px;padding:11px 13px;align-items:center;gap:9px">
+          <span style="color:var(--green);font-size:16px">✓</span>
+          <span style="font-size:13px;color:var(--t2)" id="casaText"></span>
+        </div>
+      </div>
+      <!-- TRABALHO -->
+      <div class="fi2" style="margin-bottom:20px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div style="width:36px;height:36px;border-radius:10px;background:rgba(37,99,235,0.12);border:0.5px solid rgba(37,99,235,0.25);display:flex;align-items:center;justify-content:center;font-size:18px"></div>
+          <div><div style="font-size:15px;font-weight:600">Onde você trabalha</div><div style="font-size:11px;color:var(--t3)">Monitora foco e distrações durante o expediente</div></div>
+        </div>
+        <div style="position:relative;margin-bottom:8px">
+          <input class="inp" id="endTrabalho" placeholder="Endereço ou CEP (ex: 01310-100)" type="text" oninput="searchAddr('trabalho',this.value)">
+          <div style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--t3)"></div>
+        </div>
+        <div style="font-size:11px;color:var(--t3);margin-top:5px;margin-left:2px"> Pode digitar o CEP direto — ex: <span style="color:var(--blue-l)">01310-100</span></div>
+        <div id="sugTrabalho" style="display:none;background:var(--card2);border:0.5px solid var(--border2);border-radius:12px;overflow:hidden;margin-bottom:6px;max-height:200px;overflow-y:auto"></div>
+        <div id="trabalhoConfirm" style="display:none;background:rgba(37,99,235,0.08);border:0.5px solid rgba(37,99,235,0.25);border-radius:12px;padding:11px 13px;align-items:center;gap:9px">
+          <span style="color:var(--blue-l);font-size:16px">✓</span>
+          <span style="font-size:13px;color:var(--t2)" id="trabalhoText"></span>
+        </div>
+      </div>
+      <!-- INFO -->
+      <div class="card fi3" style="margin-bottom:20px">
+        <div style="font-size:12px;font-weight:600;color:var(--t2);margin-bottom:10px">Como o Lume usa esses locais</div>
+        <div style="display:flex;flex-direction:column;gap:9px">
+          <div style="display:flex;gap:10px;align-items:flex-start"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/></svg><div style="font-size:12px;color:var(--t2);line-height:1.5">Detecta chegada em casa e inicia monitoramento do loop pós-trabalho</div></div>
+          <div style="display:flex;gap:10px;align-items:flex-start"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="9" y1="6" x2="9.01" y2="6"/><line x1="15" y1="6" x2="15.01" y2="6"/><line x1="9" y1="10" x2="9.01" y2="10"/><line x1="15" y1="10" x2="15.01" y2="10"/></svg><div style="font-size:12px;color:var(--t2);line-height:1.5">Identifica tempo de trabalho e redes sociais durante o expediente</div></div>
+          <div style="display:flex;gap:10px;align-items:flex-start"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg><div style="font-size:12px;color:var(--t2);line-height:1.5">Calcula tempo de deslocamento automaticamente</div></div>
+          <div style="display:flex;gap:10px;align-items:flex-start"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><div style="font-size:12px;color:var(--t2);line-height:1.5">Localização usada apenas localmente. Nunca compartilhada.</div></div>
+        </div>
+      </div>
+      <button class="btn fi4" style="width:100%;height:52px;margin-bottom:10px" onclick="confirmAddrs()">Confirmar e continuar</button>
+      <button class="btn-ghost fi4" style="width:100%" onclick="nav(4)">Pular por agora</button>
+    </div>
+  </div>
+
+
+  <!-- LUME VOICE OVERLAY -->
+  <div class="voice-overlay" id="voiceOverlay">
+    <div class="voice-close" onclick="closeVoice()">×</div>
+    
+    <div style="margin-bottom:32px;text-align:center">
+      <div style="font-size:24px;font-weight:300;letter-spacing:4px;color:rgba(255,255,255,0.5);margin-bottom:6px">lume</div>
+      <div style="font-size:13px;color:var(--t3)" id="voiceStatus">Toque para falar</div>
+    </div>
+
+    <div class="voice-ring" id="voiceRing">
+      <div class="voice-ring-outer"></div>
+      <div class="voice-ring-mid"></div>
+      <div class="voice-ring-inner" onclick="toggleListening()">
+        <svg id="voiceMicIcon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+      </div>
+    </div>
+
+    <!-- WAVE VISUALIZER -->
+    <div id="voiceWave" style="display:none;height:32px;display:flex;align-items:center;gap:3px;margin-top:20px">
+      <div class="wave-bar" style="--h:18px;animation-delay:0s"></div>
+      <div class="wave-bar" style="--h:28px;animation-delay:0.1s"></div>
+      <div class="wave-bar" style="--h:14px;animation-delay:0.2s"></div>
+      <div class="wave-bar" style="--h:24px;animation-delay:0.3s"></div>
+      <div class="wave-bar" style="--h:20px;animation-delay:0.15s"></div>
+      <div class="wave-bar" style="--h:30px;animation-delay:0.25s"></div>
+      <div class="wave-bar" style="--h:16px;animation-delay:0.05s"></div>
+      <div class="wave-bar" style="--h:22px;animation-delay:0.35s"></div>
+      <div class="wave-bar" style="--h:26px;animation-delay:0.2s"></div>
+      <div class="wave-bar" style="--h:12px;animation-delay:0.1s"></div>
+    </div>
+
+    <!-- QUICK ACTIONS -->
+    <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:28px;padding:0 30px" id="voiceQuickActions">
+      <button onclick="voiceCmd('Como foi meu dia?')" style="background:rgba(255,255,255,0.05);border:0.5px solid var(--border2);color:var(--t2);border-radius:18px;padding:8px 14px;font-size:12px;cursor:pointer;font-family:inherit">Como foi meu dia?</button>
+      <button onclick="voiceCmd('Quanto gastei hoje?')" style="background:rgba(255,255,255,0.05);border:0.5px solid var(--border2);color:var(--t2);border-radius:18px;padding:8px 14px;font-size:12px;cursor:pointer;font-family:inherit">Quanto gastei hoje?</button>
+      <button onclick="voiceCmd('Bloquear Instagram')" style="background:rgba(255,255,255,0.05);border:0.5px solid var(--border2);color:var(--t2);border-radius:18px;padding:8px 14px;font-size:12px;cursor:pointer;font-family:inherit">Bloquear Instagram</button>
+      <button onclick="voiceCmd('Iniciar modo foco')" style="background:rgba(255,255,255,0.05);border:0.5px solid var(--border2);color:var(--t2);border-radius:18px;padding:8px 14px;font-size:12px;cursor:pointer;font-family:inherit">Iniciar modo foco</button>
+    </div>
+
+    <!-- CONVERSATION -->
+    <div class="voice-msgs" id="voiceMsgs"></div>
+  </div>
+
+  <!-- ═══ S19: DESAFIOS ═══ -->
+  <div class="screen" id="s19">
+    <div class="sb"><span>9:41</span><span>●●●</span></div>
+    <div style="padding:8px 20px 12px;display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <div style="width:34px;height:34px;border-radius:50%;background:var(--card);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);font-size:18px" onclick="nav(7)">←</div>
+      <div style="font-size:18px;font-weight:600;flex:1">Desafios</div>
+    </div>
+    <div class="scroll" style="padding:0 20px 20px">
+
+      <!-- DESAFIO ATIVO -->
+      <div class="slabel">Desafio ativo</div>
+      <div style="background:var(--card);border:0.5px solid rgba(37,99,235,0.2);border-radius:18px;padding:18px;margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+          <div>
+            <div style="font-size:16px;font-weight:600;margin-bottom:3px">7 dias sem redes após 19h</div>
+            <div style="font-size:12px;color:var(--t3)">Iniciado há 5 dias · faltam 2</div>
+          </div>
+          <div style="font-size:10px;color:var(--blue-l);font-weight:500;background:rgba(37,99,235,0.1);padding:4px 10px;border-radius:10px">em andamento</div>
+        </div>
+        <div style="display:flex;gap:6px;margin-bottom:14px">
+          <div style="flex:1;height:6px;border-radius:3px;background:var(--blue-l)"></div>
+          <div style="flex:1;height:6px;border-radius:3px;background:var(--blue-l)"></div>
+          <div style="flex:1;height:6px;border-radius:3px;background:var(--blue-l)"></div>
+          <div style="flex:1;height:6px;border-radius:3px;background:var(--blue-l)"></div>
+          <div style="flex:1;height:6px;border-radius:3px;background:var(--blue-l)"></div>
+          <div style="flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,0.06)"></div>
+          <div style="flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,0.06)"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t3)">
+          <span>5 de 7 dias</span>
+          <span style="color:var(--blue-l);font-weight:500">71% completo</span>
+        </div>
+      </div>
+
+      <!-- DESAFIOS DISPONÍVEIS -->
+      <div class="slabel">Comece um novo desafio</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+        <div style="background:var(--card);border:0.5px solid var(--border);border-radius:16px;padding:15px;display:flex;gap:13px;align-items:center;cursor:pointer" onclick="startChallenge(this)">
+          <div style="width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,0.03);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="1.5" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
+          <div style="flex:1"><div style="font-size:14px;font-weight:500;margin-bottom:2px">21 dias: redes sociais &lt; 30min/dia</div><div style="font-size:11px;color:var(--t3);line-height:1.4">Reduza o tempo de tela pela metade</div></div>
+          <div style="color:var(--t3);font-size:16px">›</div>
+        </div>
+        <div style="background:var(--card);border:0.5px solid var(--border);border-radius:16px;padding:15px;display:flex;gap:13px;align-items:center;cursor:pointer" onclick="startChallenge(this)">
+          <div style="width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,0.03);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div>
+          <div style="flex:1"><div style="font-size:14px;font-weight:500;margin-bottom:2px">14 dias: dormir antes das 23h</div><div style="font-size:11px;color:var(--t3);line-height:1.4">Melhore a qualidade do sono</div></div>
+          <div style="color:var(--t3);font-size:16px">›</div>
+        </div>
+        <div style="background:var(--card);border:0.5px solid var(--border);border-radius:16px;padding:15px;display:flex;gap:13px;align-items:center;cursor:pointer" onclick="startChallenge(this)">
+          <div style="width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,0.03);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="1.5" stroke-linecap="round"><path d="M6.5 6.5h11M4 10h1.5M18.5 10H20M4 14h1.5M18.5 14H20M6.5 17.5h11M7.5 6.5v11M16.5 6.5v11"/></svg></div>
+          <div style="flex:1"><div style="font-size:14px;font-weight:500;margin-bottom:2px">30 dias: treinar 4x por semana</div><div style="font-size:11px;color:var(--t3);line-height:1.4">Construa o hábito definitivamente</div></div>
+          <div style="color:var(--t3);font-size:16px">›</div>
+        </div>
+        <div style="background:var(--card);border:0.5px solid var(--border);border-radius:16px;padding:15px;display:flex;gap:13px;align-items:center;cursor:pointer" onclick="startChallenge(this)">
+          <div style="width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,0.03);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+          <div style="flex:1"><div style="font-size:14px;font-weight:500;margin-bottom:2px">7 dias: ler 20 min antes de dormir</div><div style="font-size:11px;color:var(--t3);line-height:1.4">Substitua a tela por um livro</div></div>
+          <div style="color:var(--t3);font-size:16px">›</div>
+        </div>
+      </div>
+
+      <!-- DESAFIOS COMPLETADOS -->
+      <div class="slabel">Completados</div>
+      <div style="background:var(--card);border:0.5px solid var(--border);border-radius:16px;padding:15px;display:flex;gap:13px;align-items:center;opacity:0.6">
+        <div style="width:42px;height:42px;border-radius:12px;background:rgba(31,201,122,0.08);border:0.5px solid rgba(31,201,122,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div style="flex:1"><div style="font-size:14px;font-weight:500;margin-bottom:2px">3 dias sem café após 17h</div><div style="font-size:11px;color:var(--green)">Concluído · sono melhorou 22%</div></div>
+      </div>
+    </div>
+    <div class="tab">
+      <div class="ti" onclick="nav(7)"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg><span>Início</span></div>
+      <div class="ti" onclick="nav(9)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg><span>IA</span></div>
+      <div class="ti" onclick="nav(10)"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><span>Finanças</span></div>
+      <div class="ti" onclick="nav(11)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg><span>Foco</span></div>
+      <div class="ti on"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><span>Mais</span></div>
+    </div>
+  </div>
+
+  <!-- ═══ S20: RELATÓRIO SEMANAL ═══ -->
+  <div class="screen" id="s20">
+    <div class="sb"><span>9:41</span><span>●●●</span></div>
+    <div style="padding:8px 20px 12px;display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <div style="width:34px;height:34px;border-radius:50%;background:var(--card);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);font-size:18px" onclick="nav(21)">←</div>
+      <div style="flex:1"><div style="font-size:18px;font-weight:600">Seu relatório</div><div style="font-size:11px;color:var(--t3)">Personalizado · 12 — 18 de maio</div></div>
+    </div>
+    <div class="scroll" style="padding:0 20px 20px" id="reportScroll">
+
+      <!-- HEADER -->
+      <div style="background:var(--card);border:0.5px solid var(--border);border-radius:18px;padding:18px;margin-bottom:14px">
+        <div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">Baseado nos seus objetivos</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px" id="reportGoalTags">
+          <!-- Filled dynamically -->
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div>
+            <div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:4px">Life Score</div>
+            <div style="font-size:26px;font-weight:700">74</div>
+            <div style="font-size:11px;color:var(--green);margin-top:2px">+6 vs semana passada</div>
+          </div>
+          <div>
+            <div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:4px">Score dos objetivos</div>
+            <div style="font-size:26px;font-weight:700" id="reportObjScore">62%</div>
+            <div style="font-size:11px;color:var(--orange);margin-top:2px">pode melhorar</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PERSONALIZED GOAL REPORTS -->
+      <div id="reportGoalCards">
+        <!-- Filled by JS based on selected goals -->
+      </div>
+
+      <!-- SCORE EVOLUTION -->
+      <div class="slabel">Evolução semanal</div>
+      <div style="background:var(--card);border:0.5px solid var(--border);border-radius:16px;padding:16px;margin-bottom:14px">
+        <div style="display:flex;align-items:flex-end;gap:8px;height:80px">
+          <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:4px"><div style="font-size:10px;color:var(--t3)">58</div><div style="border-radius:3px 3px 0 0;width:100%;background:rgba(255,255,255,0.08);height:42px"></div><div style="font-size:9px;color:var(--t3)">S1</div></div>
+          <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:4px"><div style="font-size:10px;color:var(--t3)">63</div><div style="border-radius:3px 3px 0 0;width:100%;background:rgba(255,255,255,0.1);height:52px"></div><div style="font-size:9px;color:var(--t3)">S2</div></div>
+          <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:4px"><div style="font-size:10px;color:var(--t3)">68</div><div style="border-radius:3px 3px 0 0;width:100%;background:rgba(255,255,255,0.12);height:60px"></div><div style="font-size:9px;color:var(--t3)">S3</div></div>
+          <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:4px"><div style="font-size:10px;color:var(--blue-l);font-weight:600">74</div><div style="border-radius:3px 3px 0 0;width:100%;background:var(--blue-l);height:72px"></div><div style="font-size:9px;color:var(--blue-l);font-weight:500">Atual</div></div>
+        </div>
+      </div>
+
+      <!-- RECOMMENDATION -->
+      <div style="background:var(--card);border:0.5px solid var(--border);border-radius:16px;padding:16px;margin-bottom:14px" id="reportRecommendation">
+        <div style="font-size:13px;font-weight:600;margin-bottom:8px">Foco da próxima semana</div>
+        <div style="font-size:12px;color:var(--t2);line-height:1.65" id="reportRecText">Selecione seus objetivos no quiz para ver recomendações personalizadas.</div>
+      </div>
+
+      <!-- UPGRADE HINT -->
+      <div style="background:rgba(37,99,235,0.05);border:0.5px solid rgba(37,99,235,0.15);border-radius:14px;padding:14px;display:flex;gap:12px;align-items:flex-start">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue-l)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        <div>
+          <div style="font-size:12px;color:var(--t2);line-height:1.6">Você pode acompanhar até <strong>3 objetivos</strong> no plano atual.</div>
+          <div style="font-size:11px;color:var(--t3);margin-top:4px">Quer acompanhar mais? Em breve: Plano Pro com objetivos ilimitados.</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="tab">
+      <div class="ti" onclick="nav(7)"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg><span>Início</span></div>
+      <div class="ti" onclick="nav(9)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg><span>IA</span></div>
+      <div class="ti" onclick="nav(10)"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><span>Finanças</span></div>
+      <div class="ti" onclick="nav(11)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg><span>Foco</span></div>
+      <div class="ti on" onclick="nav(13)"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><span>Mais</span></div>
+    </div>
+  </div>
+
+  <!-- ═══ S21: PERFIL / EVOLUÇÃO ═══ -->
+  <div class="screen" id="s21">
+    <div class="sb"><span>9:41</span><span>●●●</span></div>
+    <div style="padding:8px 20px 12px;display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <div style="width:34px;height:34px;border-radius:50%;background:var(--card);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);font-size:18px" onclick="nav(7)">←</div>
+      <div style="font-size:18px;font-weight:600;flex:1">Minha evolução</div>
+    </div>
+    <div class="scroll" style="padding:0 20px 20px">
+
+      <!-- PROFILE HEADER -->
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
+        <div style="width:56px;height:56px;border-radius:50%;background:var(--card);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:500;color:var(--t2)" data-initial>R</div>
+        <div>
+          <div style="font-size:17px;font-weight:600">Rafael</div>
+          <div style="font-size:12px;color:var(--t3)">Usando Lume há 32 dias</div>
+          <div style="font-size:12px;color:var(--blue-l);margin-top:2px">3 objetivos ativos</div>
+        </div>
+      </div>
+
+      <!-- SCORE EVOLUTION 30 DAYS -->
+      <div class="slabel">Life Score · 30 dias</div>
+      <div style="background:var(--card);border:0.5px solid var(--border);border-radius:18px;padding:18px;margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:14px">
+          <div>
+            <div style="font-size:32px;font-weight:700">74</div>
+            <div style="font-size:12px;color:var(--green)">+16 desde o início</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:11px;color:var(--t3)">Início</div>
+            <div style="font-size:16px;font-weight:600;color:var(--t3)">58</div>
+          </div>
+        </div>
+        <!-- Mini line chart -->
+        <div style="display:flex;align-items:flex-end;gap:2px;height:50px">
+          <div style="flex:1;border-radius:1px;background:rgba(255,255,255,0.06);height:20%"></div>
+          <div style="flex:1;border-radius:1px;background:rgba(255,255,255,0.06);height:22%"></div>
+          <div style="flex:1;border-radius:1px;background:rgba(255,255,255,0.08);height:28%"></div>
+          <div style="flex:1;border-radius:1px;background:rgba(255,255,255,0.08);height:25%"></div>
+          <div style="flex:1;border-radius:1px;background:rgba(255,255,255,0.08);height:32%"></div>
+          <div style="flex:1;border-radius:1px;background:rgba(255,255,255,0.1);height:38%"></div>
+          <div style="flex:1;border-radius:1px;background:rgba(255,255,255,0.1);height:35%"></div>
+          <div style="flex:1;border-radius:1px;background:rgba(255,255,255,0.1);height:42%"></div>
+          <div style="flex:1;border-radius:1px;background:rgba(255,255,255,0.1);height:48%"></div>
+          <div style="flex:1;border-radius:1px;background:rgba(255,255,255,0.12);height:52%"></div>
+          <div style="flex:1;border-radius:1px;background:rgba(255,255,255,0.12);height:50%"></div>
+          <div style="flex:1;border-radius:1px;background:rgba(255,255,255,0.12);height:55%"></div>
+          <div style="flex:1;border-radius:1px;background:rgba(255,255,255,0.12);height:58%"></div>
+          <div style="flex:1;border-radius:1px;background:rgba(255,255,255,0.14);height:60%"></div>
+          <div style="flex:1;border-radius:1px;background:rgba(255,255,255,0.14);height:65%"></div>
+          <div style="flex:1;border-radius:1px;background:rgba(255,255,255,0.14);height:62%"></div>
+          <div style="flex:1;border-radius:1px;background:rgba(255,255,255,0.14);height:68%"></div>
+          <div style="flex:1;border-radius:1px;background:rgba(255,255,255,0.16);height:72%"></div>
+          <div style="flex:1;border-radius:1px;background:rgba(255,255,255,0.16);height:70%"></div>
+          <div style="flex:1;border-radius:1px;background:rgba(255,255,255,0.16);height:75%"></div>
+          <div style="flex:1;border-radius:1px;background:rgba(255,255,255,0.18);height:78%"></div>
+          <div style="flex:1;border-radius:1px;background:rgba(255,255,255,0.18);height:76%"></div>
+          <div style="flex:1;border-radius:1px;background:rgba(255,255,255,0.18);height:80%"></div>
+          <div style="flex:1;border-radius:1px;background:rgba(255,255,255,0.18);height:78%"></div>
+          <div style="flex:1;border-radius:1px;background:rgba(255,255,255,0.2);height:82%"></div>
+          <div style="flex:1;border-radius:1px;background:rgba(255,255,255,0.2);height:85%"></div>
+          <div style="flex:1;border-radius:1px;background:rgba(255,255,255,0.2);height:83%"></div>
+          <div style="flex:1;border-radius:1px;background:rgba(255,255,255,0.22);height:88%"></div>
+          <div style="flex:1;border-radius:1px;background:rgba(255,255,255,0.22);height:86%"></div>
+          <div style="flex:1;border-radius:1px;background:var(--blue-l);height:92%"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3);margin-top:6px"><span>dia 1</span><span>dia 15</span><span>hoje</span></div>
+      </div>
+
+      <!-- CONQUISTAS -->
+      <div class="slabel">Conquistas</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">
+        <div style="background:var(--card);border:0.5px solid var(--border);border-radius:14px;padding:12px;text-align:center">
+          <div style="font-size:22px;font-weight:700;color:var(--green)">12</div>
+          <div style="font-size:10px;color:var(--t3);margin-top:3px;line-height:1.3">dias sem loop pós-trabalho</div>
+        </div>
+        <div style="background:var(--card);border:0.5px solid var(--border);border-radius:14px;padding:12px;text-align:center">
+          <div style="font-size:22px;font-weight:700">8</div>
+          <div style="font-size:10px;color:var(--t3);margin-top:3px;line-height:1.3">treinos completados</div>
+        </div>
+        <div style="background:var(--card);border:0.5px solid var(--border);border-radius:14px;padding:12px;text-align:center">
+          <div style="font-size:22px;font-weight:700">3</div>
+          <div style="font-size:10px;color:var(--t3);margin-top:3px;line-height:1.3">desafios concluídos</div>
+        </div>
+      </div>
+
+      <!-- PADRÕES QUEBRADOS -->
+      <div class="slabel">Padrões quebrados</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+        <div style="background:var(--card);border:0.5px solid var(--border);border-radius:14px;padding:14px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <div style="font-size:13px;font-weight:500">Loop pós-trabalho</div>
+            <div style="font-size:11px;color:var(--green);font-weight:500">-67%</div>
+          </div>
+          <div class="pbar-wrap"><div class="pbar" style="--w:33%;background:var(--green)"></div></div>
+          <div style="font-size:11px;color:var(--t3);margin-top:5px">De 14 dias consecutivos para 4 na última semana</div>
+        </div>
+        <div style="background:var(--card);border:0.5px solid var(--border);border-radius:14px;padding:14px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <div style="font-size:13px;font-weight:500">Café tardio</div>
+            <div style="font-size:11px;color:var(--green);font-weight:500">-80%</div>
+          </div>
+          <div class="pbar-wrap"><div class="pbar" style="--w:20%;background:var(--green)"></div></div>
+          <div style="font-size:11px;color:var(--t3);margin-top:5px">Café após 17h: de 5 dias para 1 na última semana</div>
+        </div>
+      </div>
+
+      <!-- RELATÓRIO -->
+      <div onclick="nav(20)" style="background:var(--card);border:0.5px solid var(--border);border-radius:16px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <div style="flex:1"><div style="font-size:14px;font-weight:500">Relatório semanal</div><div style="font-size:11px;color:var(--t3);margin-top:1px">12 — 18 de maio · pronto para ver</div></div>
+        <div style="color:var(--t3);font-size:16px">›</div>
+      </div>
+    </div>
+    <div class="tab">
+      <div class="ti" onclick="nav(7)"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg><span>Início</span></div>
+      <div class="ti" onclick="nav(9)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg><span>IA</span></div>
+      <div class="ti" onclick="nav(10)"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><span>Finanças</span></div>
+      <div class="ti" onclick="nav(11)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg><span>Foco</span></div>
+      <div class="ti on"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><span>Mais</span></div>
+    </div>
+  </div>
+
+
+</div>
+</div>
+
+<script>
+const TOTAL=21;
+let cur=1;
+
+function nav(n){cur=n;showS(n);}
+function go(d){let n=cur+d;if(n<1)n=TOTAL;if(n>TOTAL)n=1;cur=n;showS(n);}
+function showS(n){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const el=document.getElementById('s'+n);
+  if(el)el.classList.add('active');
+  const ctr=document.getElementById('ctr');
+  if(ctr)ctr.textContent=n+'/'+TOTAL;
+}
+
+// PAYMENT
+function selPay(t){
+  const card=document.getElementById('segCard');
+  const pix=document.getElementById('segPix');
+  const cf=document.getElementById('cardF');
+  if(card)card.style.cssText='flex:1;padding:9px;border-radius:9px;border:none;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;background:'+(t==='card'?'var(--blue)':'transparent')+';color:'+(t==='card'?'#fff':'var(--t2)');
+  if(pix)pix.style.cssText='flex:1;padding:9px;border-radius:9px;border:none;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;background:'+(t==='pix'?'var(--blue)':'transparent')+';color:'+(t==='pix'?'#fff':'var(--t2)');
+  if(cf)cf.style.display=t==='card'?'flex':'none';
+}
+
+// PASSWORD
+function tpw(id){const e=document.getElementById(id);if(e)e.type=e.type==='password'?'text':'password';}
+
+// FOCUS TIMER
+let fRun=false,fInt=null,fSec=2700;
+function toggleFocus(){
+  fRun=!fRun;
+  const b=document.getElementById('fbtn');
+  if(!b)return;
+  if(fRun){
+    b.textContent='Pausar';
+    fInt=setInterval(()=>{
+      if(fSec<=0){clearInterval(fInt);return;}
+      fSec--;
+      const m=Math.floor(fSec/60),s=fSec%60;
+      const t=document.getElementById('ftimer');
+      if(t)t.textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+    },1000);
+  } else {
+    b.textContent='Retomar';
+    clearInterval(fInt);
+  }
+}
+
+// CONNECTIONS
+function togConn(card){
+  const t=card.querySelector('.ctog');
+  if(t)t.classList.toggle('on');
+}
+function connApp(card){
+  const b=card.querySelector('.cbtn');
+  if(b&&b.textContent==='Conectar'){
+    b.textContent='✓ Conectado';
+    b.style.cssText='background:rgba(31,201,122,0.12);border:0.5px solid rgba(31,201,122,0.3);color:var(--green);border-radius:18px;padding:5px 13px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit';
+    card.classList.add('on');
+  }
+}
+
+// BLOCK
+function blockNow(btn){
+  btn.textContent='✓ Bloqueado até 21h';
+  btn.style.cssText='flex:1;background:rgba(31,201,122,0.12);border:0.5px solid rgba(31,201,122,0.3);color:var(--green);border-radius:10px;padding:9px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit';
+}
+
+// QUIZ
+let selectedGoals=[];
+function toggleGoal(el,goal){
+  if(el.classList.contains('selected')){
+    el.classList.remove('selected');
+    selectedGoals=selectedGoals.filter(g=>g!==goal);
+  } else {
+    if(selectedGoals.length>=3)return;
+    el.classList.add('selected');
+    selectedGoals.push(goal);
+  }
+  const btn=document.getElementById('quizBtn');
+  const cnt=document.getElementById('quizCount');
+  if(btn&&cnt){
+    if(selectedGoals.length>0){
+      btn.style.opacity='1';btn.style.pointerEvents='auto';
+      cnt.textContent=selectedGoals.length+' objetivo'+(selectedGoals.length>1?'s':'')+' selecionado'+(selectedGoals.length>1?'s':'');
+      cnt.style.color='var(--blue-l)';
+    } else {
+      btn.style.opacity='0.4';btn.style.pointerEvents='none';
+      cnt.textContent='Selecione ao menos 1 objetivo';
+      cnt.style.color='var(--t3)';
+    }
+  }
+}
+
+// ADDRESSES
+let addrState={casa:'',trabalho:''};
+const addrSug={
+  'casa':['Rua das Flores, 123 — Vila Mariana, SP','Rua Vergueiro, 450 — Paraíso, SP','Av. Jabaquara, 800 — Saúde, SP'],
+  'trabalho':['Av. Paulista, 1000 — Bela Vista, SP','Av. Faria Lima, 2000 — Pinheiros, SP','Rua Consolação, 300 — Cerqueira César, SP']
+};
+// Address autocomplete with debounce + CEP lookup
+let addrDebounce = {};
+const streetTypes = ['Rua','Av.','Avenida','Alameda','Travessa','Rod.','Rodovia','Praça','Estrada'];
+const neighborhoods = ['Centro','Vila Mariana','Pinheiros','Moema','Itaim Bibi','Consolação','Perdizes','Lapa','Santana','Tatuapé','Bela Vista','Liberdade','Brooklin','Morumbi','Saúde','Jabaquara','Butantã','Vila Madalena','Jardins','Higienópolis'];
+
+function isCEP(val) {
+  return /^[\d]{5}-?[\d]{0,3}$/.test(val.trim());
+}
+
+function formatCEP(val) {
+  const digits = val.replace(/\D/g,'');
+  if (digits.length <= 5) return digits;
+  return digits.substring(0,5) + '-' + digits.substring(5,8);
+}
+
+async function lookupCEP(cep, type) {
+  const digits = cep.replace(/\D/g,'');
+  if (digits.length !== 8) return null;
+  try {
+    const res = await fetch(`https://viacep.com.br/ws/${digits}/json/`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (data.erro) return null;
+    return data;
+  } catch(e) {
+    return null;
+  }
+}
+
+function generateSuggestions(val) {
+  if (!val || val.length < 2) return [];
+  const baseAddr = streetTypes.some(t => val.toLowerCase().startsWith(t.toLowerCase())) ? val : `Rua ${val.charAt(0).toUpperCase()+val.slice(1)}`;
+  const hasNumber = val.trim().split(' ').some(p => /^\d+$/.test(p));
+  const useNeighborhoods = neighborhoods.slice(0, 4);
+  const results = [];
+  useNeighborhoods.forEach(nb => {
+    const num = hasNumber ? '' : ', ' + (Math.floor(Math.random()*1000)+1);
+    results.push(`${baseAddr}${num} — ${nb}, São Paulo, SP`);
+  });
+  return results.slice(0, 4);
+}
+
+function showSugLoading(sug, msg) {
+  sug.innerHTML = `<div style="padding:13px 14px;font-size:12px;color:var(--t3);display:flex;align-items:center;gap:9px">
+    <span style="display:inline-block;width:13px;height:13px;border:1.5px solid var(--border2);border-top-color:var(--blue-l);border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0"></span>
+    ${msg}
+  </div>`;
+  sug.style.display = 'block';
+}
+
+function showSugResults(sug, type, suggestions) {
+  if (!suggestions.length) { sug.style.display = 'none'; return; }
+  sug.innerHTML = suggestions.map(addr => {
+    const safe = addr.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return `<div onclick="selectAddr('${type}','${safe}')"
+      onmouseover="this.style.background='rgba(37,99,235,0.08)'"
+      onmouseout="this.style.background='transparent'"
+      style="padding:12px 14px;font-size:13px;color:var(--t2);border-bottom:0.5px solid var(--border);cursor:pointer;display:flex;align-items:center;gap:10px;transition:background 0.15s">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--blue-l)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <span style="line-height:1.4">${addr}</span>
+    </div>`;
+  }).join('');
+  sug.style.display = 'block';
+}
+
+function showSugError(sug, msg) {
+  sug.innerHTML = `<div style="padding:13px 14px;font-size:12px;color:var(--red);display:flex;align-items:center;gap:9px">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    ${msg}
+  </div>`;
+  sug.style.display = 'block';
+}
+
+function searchAddr(type, val) {
+  const sugId = type === 'casa' ? 'sugCasa' : 'sugTrabalho';
+  const confId = type + 'Confirm';
+  const inpId = type === 'casa' ? 'endCasa' : 'endTrabalho';
+  const sug = document.getElementById(sugId);
+  const conf = document.getElementById(confId);
+
+  if (conf) conf.style.display = 'none';
+  if (!sug) return;
+  if (!val || val.length < 2) { sug.style.display = 'none'; return; }
+
+  clearTimeout(addrDebounce[type]);
+
+  // CEP detection
+  if (isCEP(val)) {
+    const digits = val.replace(/\D/g,'');
+    // Format input as CEP while typing
+    const inp = document.getElementById(inpId);
+    if (inp && digits.length > 5) {
+      const formatted = formatCEP(digits);
+      if (inp.value !== formatted) { inp.value = formatted; }
+    }
+    if (digits.length < 8) {
+      showSugLoading(sug, `Digite mais ${8 - digits.length} dígito${8-digits.length>1?'s':''} para buscar o CEP`);
+      return;
+    }
+    // Full CEP — fetch
+    showSugLoading(sug, 'Buscando CEP...');
+    addrDebounce[type] = setTimeout(async () => {
+      const data = await lookupCEP(digits, type);
+      if (!data) {
+        showSugError(sug, 'CEP não encontrado. Verifique e tente novamente.');
+        return;
+      }
+      const logradouro = data.logradouro || '';
+      const bairro = data.bairro || '';
+      const cidade = data.localidade || '';
+      const estado = data.uf || '';
+      const full = [logradouro, bairro, cidade + (estado ? ', '+estado : '')].filter(Boolean).join(' — ');
+      // Auto-fill and confirm
+      const inp = document.getElementById(inpId);
+      if (inp) inp.value = full;
+      sug.style.display = 'none';
+      const conf2 = document.getElementById(confId);
+      const txtEl = document.getElementById(type+'Text');
+      if (conf2) conf2.style.display = 'flex';
+      if (txtEl) txtEl.textContent = full + ' (CEP ' + formatCEP(digits) + ')';
+      addrState[type] = full;
+    }, 200);
+    return;
+  }
+
+  // Regular text search with debounce
+  showSugLoading(sug, 'Buscando endereços...');
+  addrDebounce[type] = setTimeout(() => {
+    const suggestions = generateSuggestions(val);
+    showSugResults(sug, type, suggestions);
+  }, 350);
+}
+
+
+function selectAddr(type,addr){
+  const inpId=type==='casa'?'endCasa':'endTrabalho';
+  const sugId=type==='casa'?'sugCasa':'sugTrabalho';
+  const confId=type+'Confirm';
+  const txtId=type+'Text';
+  const inp=document.getElementById(inpId);
+  if(inp)inp.value=addr;
+  const sug=document.getElementById(sugId);
+  if(sug)sug.style.display='none';
+  const conf=document.getElementById(confId);
+  if(conf)conf.style.display='flex';
+  const txt=document.getElementById(txtId);
+  if(txt)txt.textContent=addr;
+  addrState[type]=addr;
+}
+function confirmAddrs(){saveAddresses(addrState.casa, addrState.trabalho);nav(4);}
+
+// SUPPORT CHAT
+const botR={
+  'Problema com pagamento':'Verifique se o cartão está válido e com limite. Tente também Pix ou Apple Pay. Precisa de mais ajuda?',
+  'Não consigo conectar um app':'Vá em Conexões e toque "Conectar" ao lado do app. Certifique-se de estar logado no app primeiro.',
+  'Como funciona o Radar de Padrões?':'O Radar analisa seu comportamento diário e detecta loops — como abrir Instagram ao chegar em casa no horário do treino. Ele alerta antes do padrão acontecer.',
+  'Quero cancelar meu plano':'Sentimos muito  Vá em Configurações → Assinatura → Cancelar. Você mantém o acesso até o fim do período pago.',
+  'Como registro gastos pelo WhatsApp?':'Na aba Finanças, toque em "Registrar gasto via WhatsApp". Escreva naturalmente: "almocei fora R\$28" ou envie foto do comprovante.',
+  '_d':'Obrigado! Recebi sua mensagem. Um especialista do Lume entrará em contato em instantes. Há mais alguma coisa que posso fazer agora?'
+};
+function addMsg(txt,isUser){
+  const c=document.getElementById('chatMsgs');
+  if(!c)return;
+  const d=document.createElement('div');
+  if(isUser){
+    d.style.cssText='display:flex;justify-content:flex-end;margin-bottom:2px';
+    d.innerHTML='<div class="mbubble-user">'+txt+'</div>';
+  } else {
+    d.style.cssText='display:flex;gap:10px;align-items:flex-end;margin-bottom:2px';
+    d.innerHTML='<div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#2d6ef7,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3"/></svg></div><div style="max-width:78%"><div class="mbubble-bot">'+txt+'</div></div>';
+  }
+  c.appendChild(d);
+  c.scrollTop=c.scrollHeight;
+}
+function showTyping(){
+  const c=document.getElementById('chatMsgs');
+  if(!c)return;
+  const d=document.createElement('div');
+  d.id='typ';
+  d.style.cssText='display:flex;gap:10px;align-items:flex-end;margin-bottom:2px';
+  d.innerHTML='<div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#2d6ef7,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3"/></svg></div><div class="mbubble-bot"><div style="display:flex;gap:5px;padding:2px 0"><div class="td"></div><div class="td"></div><div class="td"></div></div></div>';
+  c.appendChild(d);
+  c.scrollTop=c.scrollHeight;
+}
+function hideTyping(){const e=document.getElementById('typ');if(e)e.remove();}
+function qsend(t){
+  const qr=document.getElementById('qreplies');
+  if(qr)qr.style.display='none';
+  addMsg(t,true);
+  showTyping();
+  setTimeout(()=>{hideTyping();addMsg(botR[t]||botR['_d'],false);},1400);
+}
+function csend(){
+  const i=document.getElementById('chatInp');
+  if(!i)return;
+  const t=i.value.trim();
+  if(!t)return;
+  i.value='';
+  addMsg(t,true);
+  showTyping();
+  setTimeout(()=>{hideTyping();addMsg(botR['_d'],false);},1600);
+}
+
+// GASTOS WHATSAPP
+const gCats={
+  'cafe':'Alimentação','café':'Alimentação','mercado':'Alimentação',
+  'almoç':'Alimentação','janta':'Alimentação','comid':'Alimentação',
+  'lanche':'Alimentação','restaur':'Alimentação','ifood':'Alimentação',
+  'uber':'Transporte','taxi':'Transporte','onibus':'Transporte',
+  'gasolina':'Transporte','estacion':'Transporte',
+  'academia':'Saúde','farmacia':'Saúde','medico':'Saúde',
+  'netflix':'Lazer','cinema':'Lazer','bar':'Lazer'
+};
+function parseGasto(txt){
+  const m=txt.match(/[\d]+[,.]?[\d]*/);
+  const value=m?parseFloat(m[0].replace(',','.')).toFixed(2):'0.00';
+  let cat='Outros';
+  const low=txt.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+  for(const k in gCats){if(low.includes(k)){cat=gCats[k];break;}}
+  const em={'Alimentação':'·','Transporte':'','Saúde':'','Lazer':'·','Outros':'·'};
+  return{value,cat,emoji:em[cat]||'·'};
+}
+function addGastoMsg(txt,isUser){
+  const c=document.getElementById('gastosMsg');
+  if(!c)return;
+  const d=document.createElement('div');
+  if(isUser){
+    d.style.cssText='display:flex;justify-content:flex-end';
+    d.innerHTML='<div class="mbubble-user" style="background:rgba(37,211,102,0.65)">'+txt+'</div>';
+  } else {
+    d.style.cssText='display:flex;gap:8px;align-items:flex-end';
+    d.innerHTML='<div style="width:28px;height:28px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0"></div><div class="mbubble-bot" style="background:rgba(37,211,102,0.08);border-color:rgba(37,211,102,0.2)">'+txt+'</div>';
+  }
+  c.appendChild(d);
+  c.scrollTop=c.scrollHeight;
+}
+function gastosTyping(id){
+  const c=document.getElementById('gastosMsg');
+  if(!c)return;
+  const d=document.createElement('div');
+  d.id=id;
+  d.style.cssText='display:flex;gap:8px;align-items:flex-end';
+  d.innerHTML='<div style="width:28px;height:28px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0"></div><div class="mbubble-bot" style="background:rgba(37,211,102,0.08);border-color:rgba(37,211,102,0.2)"><div style="display:flex;gap:4px"><div class="td"></div><div class="td"></div><div class="td"></div></div></div>';
+  c.appendChild(d);
+  c.scrollTop=c.scrollHeight;
+}
+function sendGasto(){
+  const inp=document.getElementById('gastosInp');
+  if(!inp)return;
+  const txt=inp.value.trim();
+  if(!txt)return;
+  inp.value='';
+  addGastoMsg(txt,true);
+  gastosTyping('gtyp');
+  setTimeout(()=>{
+    const e=document.getElementById('gtyp');if(e)e.remove();
+    const g=parseGasto(txt);
+    const hora=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    addGastoMsg('Registrado! '+g.emoji+'<br><strong>'+g.cat+' · R$ '+g.value+'</strong><br>'+hora+' · Hoje',false);
+  },1200);
+}
+function sendFoto(){
+  addGastoMsg('Comprovante enviado',true);
+  gastosTyping('gtyp2');
+  setTimeout(()=>{
+    const e=document.getElementById('gtyp2');if(e)e.remove();
+    const hora=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    addGastoMsg('Comprovante lido! ·<br><strong>Alimentação · R$ 34,90</strong><br>'+hora+' · Hoje<br><br>Detectei: pedido iFood, taxa de entrega inclusa.',false);
+  },2200);
+}
+
+
+// LUME VOICE ASSISTANT
+let voiceListening = false;
+let voiceRecognition = null;
+
+function openVoice() {
+  const overlay = document.getElementById('voiceOverlay');
+  if (overlay) overlay.classList.add('open');
+  document.getElementById('voiceStatus').textContent = 'Toque para falar';
+  document.getElementById('voiceWave').style.display = 'none';
+  document.getElementById('voiceQuickActions').style.display = 'flex';
+}
+
+function closeVoice() {
+  const overlay = document.getElementById('voiceOverlay');
+  if (overlay) overlay.classList.remove('open');
+  stopListening();
+  // Clear messages
+  document.getElementById('voiceMsgs').innerHTML = '';
+}
+
+function toggleListening() {
+  if (voiceListening) {
+    stopListening();
+  } else {
+    startListening();
+  }
+}
+
+function startListening() {
+  voiceListening = true;
+  const overlay = document.getElementById('voiceOverlay');
+  overlay.classList.add('listening');
+  document.getElementById('voiceStatus').textContent = 'Ouvindo...';
+  document.getElementById('voiceWave').style.display = 'flex';
+  document.getElementById('voiceQuickActions').style.display = 'none';
+
+  // Try Web Speech API
+  if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    voiceRecognition = new SR();
+    voiceRecognition.lang = 'pt-BR';
+    voiceRecognition.continuous = false;
+    voiceRecognition.interimResults = false;
+    voiceRecognition.onresult = function(e) {
+      const text = e.results[0][0].transcript;
+      stopListening();
+      voiceCmd(text);
+    };
+    voiceRecognition.onerror = function() {
+      stopListening();
+      // Simulate a response after 2s if speech fails
+      setTimeout(() => {
+        voiceCmd('Como foi meu dia?');
+      }, 500);
+    };
+    voiceRecognition.onend = function() {
+      if (voiceListening) stopListening();
+    };
+    try { voiceRecognition.start(); } catch(e) {}
+  } else {
+    // Fallback: simulate listening for 2.5s
+    setTimeout(() => {
+      stopListening();
+      voiceCmd('Como foi meu dia?');
+    }, 2500);
+  }
+}
+
+function stopListening() {
+  voiceListening = false;
+  const overlay = document.getElementById('voiceOverlay');
+  overlay.classList.remove('listening');
+  document.getElementById('voiceStatus').textContent = 'Toque para falar';
+  document.getElementById('voiceWave').style.display = 'none';
+  if (voiceRecognition) {
+    try { voiceRecognition.stop(); } catch(e) {}
+    voiceRecognition = null;
+  }
+}
+
+const lumeResponses = {
+  'dia': 'Hoje você passou 8h45m no trabalho, usou Instagram por 1h22m durante o expediente, e ainda não treinou. Seu Life Score está em 74. Recomendo iniciar o treino nos próximos 8 minutos.',
+  'gast': 'Hoje você registrou R\$42,50 em gastos: R\$28 em alimentação e R\$14,50 em transporte. Você está 68% da meta mensal de alimentação. Atenção: Uber este mês está 34% acima do mês passado.',
+  'bloq': 'Instagram bloqueado até 21h. Nos últimos 14 dias, bloquear o Instagram após o trabalho aumentou sua chance de treinar em 78%. Boa escolha.',
+  'foco': 'Modo foco iniciado — 45 minutos de Deep Work. Instagram, WhatsApp e YouTube bloqueados. Foco total.',
+  'sono': 'Seu sono ontem foi de 7h24m com qualidade de 68%. Nos últimos 5 dias você tomou café após 17h e dormiu em média 48 minutos mais tarde. Recomendo último café até 14h.',
+  'trei': 'Você não treinou nenhuma vez esta semana. Seu objetivo é 3x por semana. Agora é o melhor horário — sua energia está boa e você acabou de chegar em casa. Quer que eu inicie o timer de treino?',
+  'padr': 'Detectei 3 padrões ativos: 1) Loop pós-trabalho com Instagram (14 dias), 2) Café tardio afetando sono (5 dias), 3) Hidratação baixa reduzindo foco em 18%. Quer ver os detalhes?',
+  '_default': 'Entendi. Vou analisar seus dados e preparar uma resposta. Enquanto isso, posso te ajudar com: resumo do dia, gastos, foco, sono ou padrões detectados.'
+};
+
+function matchResponse(text) {
+  const lower = text.toLowerCase();
+  for (const [key, response] of Object.entries(lumeResponses)) {
+    if (key !== '_default' && lower.includes(key)) return response;
+  }
+  return lumeResponses['_default'];
+}
+
+function voiceCmd(text) {
+  const msgs = document.getElementById('voiceMsgs');
+  document.getElementById('voiceQuickActions').style.display = 'none';
+
+  // User message
+  const userDiv = document.createElement('div');
+  userDiv.className = 'voice-msg user';
+  userDiv.textContent = text;
+  msgs.appendChild(userDiv);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  // Show "thinking"
+  document.getElementById('voiceStatus').textContent = 'Processando...';
+
+  // Bot response after delay
+  setTimeout(() => {
+    const response = matchResponse(text);
+    const botDiv = document.createElement('div');
+    botDiv.className = 'voice-msg bot';
+    botDiv.textContent = response;
+    msgs.appendChild(botDiv);
+    msgs.scrollTop = msgs.scrollHeight;
+    document.getElementById('voiceStatus').textContent = 'Toque para falar';
+
+    // Try text-to-speech
+    if ('speechSynthesis' in window) {
+      const utter = new SpeechSynthesisUtterance(response);
+      utter.lang = 'pt-BR';
+      utter.rate = 1.05;
+      utter.pitch = 1;
+      window.speechSynthesis.speak(utter);
+    }
+  }, 1200);
+}
+
+
+
+function startChallenge(el) {
+  const name = el.querySelector('div[style*="font-weight:500"]');
+  if (name) {
+    el.style.borderColor = 'rgba(37,99,235,0.3)';
+    el.style.background = 'rgba(37,99,235,0.04)';
+    const arrow = el.querySelector('div:last-child');
+    if (arrow) arrow.textContent = '✓';
+    if (arrow) arrow.style.color = 'var(--green)';
+    const sub = el.querySelector('div[style*="font-size:11px"]');
+    if (sub) { sub.textContent = 'Desafio iniciado'; sub.style.color = 'var(--blue-l)'; }
+  }
+}
+
+
+// PERSONALIZED REPORT DATA
+const goalReports = {
+  'treinar': {
+    tag: 'Treinar',
+    title: 'Atividade física',
+    improved: 'Treinou <strong>2 vezes</strong> esta semana — semana passada foi 1',
+    attention: 'Meta é 3x por semana. O loop pós-trabalho impediu treino em 4 dias',
+    streak: '3 treinos',
+    streakDays: 'esta semana',
+    score: 67,
+    recommendation: 'Bloquear Instagram entre 19h e 20h aumenta sua chance de treinar em 78%. Tente nos próximos 2 dias para bater a meta.'
+  },
+  'ler': {
+    tag: 'Ler mais',
+    title: 'Tempo de leitura',
+    improved: 'Leu <strong>15 min/dia</strong> em média — +8 min vs semana passada',
+    attention: 'Meta é 20 min/dia. Em 3 dias não leu nada — coincidiu com noites de tela longa',
+    streak: '4 dias lendo',
+    streakDays: 'consecutivos',
+    score: 58,
+    recommendation: 'Nos dias que você leu antes de dormir, seu sono melhorou 14%. Tente substituir os últimos 20 min de celular por leitura.'
+  },
+  'redes': {
+    tag: 'Menos redes',
+    title: 'Tempo em redes sociais',
+    improved: 'Média diária <strong>caiu para 1h52m</strong> — era 2h40m na semana passada',
+    attention: 'Ainda acima da meta de 1h/dia. Instagram representa 72% do tempo',
+    streak: '12 dias sem loop',
+    streakDays: 'pós-trabalho',
+    score: 55,
+    recommendation: 'Seu pior horário é entre 19h e 20h30. Se bloquear redes nesse período, economia de 48 min/dia.'
+  },
+  'custos': {
+    tag: 'Reduzir custos',
+    title: 'Controle financeiro',
+    improved: 'Gastou <strong>R\$342</strong> esta semana — 12% menos que a anterior',
+    attention: 'Uber representou R\$89 (26% do total). Acima do padrão em 34%',
+    streak: '5 dias registrando',
+    streakDays: 'gastos pelo WhatsApp',
+    score: 72,
+    recommendation: 'Transporte é seu maior gasto variável. Considere alternativas para os trajetos curtos de Uber — economia potencial de R\$200/mês.'
+  },
+  'alcool': {
+    tag: 'Sem álcool',
+    title: 'Consumo de álcool',
+    improved: 'Nenhum registro de álcool em <strong>5 dos 7 dias</strong>',
+    attention: 'Sexta e sábado houve consumo. Sono caiu 32% nesses dias, produtividade no dia seguinte caiu 45%',
+    streak: '5 dias sem álcool',
+    streakDays: 'consecutivos',
+    score: 71,
+    recommendation: 'Nos dias sem álcool seu Life Score foi 18 pontos maior. O impacto no sono e produtividade do dia seguinte é o mais significativo.'
+  },
+  'porno': {
+    tag: 'Conteúdo adulto',
+    title: 'Acesso a conteúdo adulto',
+    improved: 'Tempo de acesso <strong>caiu 64%</strong> vs semana passada',
+    attention: 'Acessos concentrados entre 23h e 1h — correlação com noites de insônia',
+    streak: '8 dias sem acesso',
+    streakDays: 'consecutivos',
+    score: 75,
+    recommendation: 'O padrão acontece em noites que você fica no celular depois das 23h. Ativar modo foco noturno às 22h30 bloqueia o gatilho.'
+  },
+  'sono': {
+    tag: 'Dormir melhor',
+    title: 'Qualidade do sono',
+    improved: 'Dormiu antes das 23h em <strong>5 de 7 noites</strong> — sono melhorou 18%',
+    attention: 'Café após 17h em 2 dias causou atraso médio de 48 min para dormir',
+    streak: '5 dias dormindo cedo',
+    streakDays: 'antes das 23h',
+    score: 68,
+    recommendation: 'Seu sono é diretamente impactado por café (após 14h) e tela (após 22h). Eliminar esses dois gatilhos pode melhorar sua qualidade em até 35%.'
+  },
+  'foco': {
+    tag: 'Mais foco',
+    title: 'Produtividade e foco',
+    improved: 'Completou <strong>8 sessões de foco</strong> — +3 vs semana passada',
+    attention: 'Instagram durante trabalho: 1h22m. Maior distração entre 10h e 11h30',
+    streak: '3 dias produtivos',
+    streakDays: 'consecutivos',
+    score: 62,
+    recommendation: 'Seu pico de foco é entre 9h e 11h. Bloquear notificações nesse horário pode ganhar 45 min produtivos por dia.'
+  }
+};
+
+function buildReport() {
+  const tags = document.getElementById('reportGoalTags');
+  const cards = document.getElementById('reportGoalCards');
+  const recText = document.getElementById('reportRecText');
+  const objScore = document.getElementById('reportObjScore');
+  if (!tags || !cards) return;
+
+  const goals = selectedGoals.length ? selectedGoals : ['redes', 'treinar', 'sono'];
+  
+  // Build tags
+  tags.innerHTML = goals.map(g => {
+    const r = goalReports[g];
+    return r ? '<div style="background:rgba(255,255,255,0.05);border:0.5px solid var(--border2);border-radius:10px;padding:4px 10px;font-size:11px;color:var(--t2)">' + r.tag + '</div>' : '';
+  }).join('');
+
+  // Calculate average score
+  let totalScore = 0;
+  let count = 0;
+
+  // Build goal cards
+  cards.innerHTML = goals.map(g => {
+    const r = goalReports[g];
+    if (!r) return '';
+    totalScore += r.score;
+    count++;
+    return '<div class="slabel">' + r.title + '</div>' +
+      '<div style="background:var(--card);border:0.5px solid var(--border);border-radius:16px;padding:16px;margin-bottom:14px">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">' +
+          '<div style="font-size:12px;color:var(--t3)">Score do objetivo</div>' +
+          '<div style="font-size:16px;font-weight:700;color:' + (r.score >= 70 ? 'var(--green)' : r.score >= 50 ? 'var(--orange)' : 'var(--red)') + '">' + r.score + '%</div>' +
+        '</div>' +
+        '<div style="background:rgba(31,201,122,0.06);border:0.5px solid rgba(31,201,122,0.15);border-radius:12px;padding:12px;margin-bottom:8px;display:flex;gap:10px;align-items:flex-start">' +
+          '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" style="flex-shrink:0;margin-top:3px"><polyline points="18 15 12 9 6 15"/></svg>' +
+          '<div style="font-size:12px;color:var(--t2);line-height:1.5">' + r.improved + '</div>' +
+        '</div>' +
+        '<div style="background:rgba(239,79,96,0.06);border:0.5px solid rgba(239,79,96,0.15);border-radius:12px;padding:12px;display:flex;gap:10px;align-items:flex-start">' +
+          '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2.5" stroke-linecap="round" style="flex-shrink:0;margin-top:3px"><polyline points="6 9 12 15 18 9"/></svg>' +
+          '<div style="font-size:12px;color:var(--t2);line-height:1.5">' + r.attention + '</div>' +
+        '</div>' +
+      '</div>';
+  }).join('');
+
+  // Update average score
+  if (objScore && count > 0) {
+    const avg = Math.round(totalScore / count);
+    objScore.textContent = avg + '%';
+  }
+
+  // Build recommendation from first goal
+  if (recText && goals[0] && goalReports[goals[0]]) {
+    recText.textContent = goalReports[goals[0]].recommendation;
+  }
+}
+
+// Hook into nav to build report when opening s20
+const origNav = nav;
+nav = function(n) {
+  origNav(n);
+  if (n === 20 || n === 21) buildReport();
+};
+
+
+
+// FIREBASE AUTH
+let currentUser = null;
+
+function loginGoogle() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider)
+    .then((result) => {
+      currentUser = result.user;
+      // Update UI with user name
+      updateUserUI(result.user);
+      // Save user to Firestore
+      saveUserData(result.user);
+      // Go to quiz
+      nav(16);
+    })
+    .catch((error) => {
+      console.log('Login error:', error.message);
+      // If popup blocked (common on mobile), try redirect
+      if (error.code === 'auth/popup-blocked' || error.code === 'auth/popup-closed-by-user') {
+        auth.signInWithRedirect(provider);
+      } else {
+        // Fallback: proceed to quiz anyway for demo
+        nav(16);
+      }
+    });
+}
+
+// Handle redirect result (for mobile)
+auth.getRedirectResult().then((result) => {
+  if (result.user) {
+    currentUser = result.user;
+    updateUserUI(result.user);
+    saveUserData(result.user);
+    nav(16);
+  }
+}).catch(() => {});
+
+// Check if already logged in
+auth.onAuthStateChanged((user) => {
+  if (user) {
+    currentUser = user;
+    updateUserUI(user);
+  }
+});
+
+function updateUserUI(user) {
+  if (!user) return;
+  const firstName = user.displayName ? user.displayName.split(' ')[0] : 'Usuário';
+  // Update dashboard greeting
+  const greetings = document.querySelectorAll('[data-greeting]');
+  greetings.forEach(el => el.textContent = 'Bom dia, ' + firstName);
+  // Update profile initial
+  const initials = document.querySelectorAll('[data-initial]');
+  const initial = firstName.charAt(0).toUpperCase();
+  initials.forEach(el => el.textContent = initial);
+}
+
+async function saveUserData(user) {
+  try {
+    await db.collection('users').doc(user.uid).set({
+      name: user.displayName || '',
+      email: user.email || '',
+      photo: user.photoURL || '',
+      goals: selectedGoals,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+    console.log('User saved to Firestore');
+  } catch(e) {
+    console.log('Firestore error:', e);
+  }
+}
+
+async function saveGoals() {
+  if (!currentUser) return;
+  try {
+    await db.collection('users').doc(currentUser.uid).update({
+      goals: selectedGoals
+    });
+    console.log('Goals saved');
+  } catch(e) {
+    console.log('Save goals error:', e);
+  }
+}
+
+async function saveAddresses(casa, trabalho) {
+  if (!currentUser) return;
+  try {
+    await db.collection('users').doc(currentUser.uid).update({
+      addresses: { casa, trabalho }
+    });
+    console.log('Addresses saved');
+  } catch(e) {
+    console.log('Save addresses error:', e);
+  }
+}
+
+
+// SWIPE
+let tx=0;
+const dev=document.getElementById('device');
+if(dev){
+  dev.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;},{passive:true});
+  dev.addEventListener('touchend',e=>{
+    const dx=e.changedTouches[0].clientX-tx;
+    if(Math.abs(dx)>50)go(dx<0?1:-1);
+  });
+}
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => console.log('SW registrado:', reg.scope))
+      .catch(err => console.log('SW erro:', err));
+  });
+}
+</script>
+</body>
+</html>
